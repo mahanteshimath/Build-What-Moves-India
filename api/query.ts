@@ -55,6 +55,19 @@ const NAMED_QUERIES: Record<string, string> = {
 
 snowflake.configure({ logLevel: 'ERROR' })
 
+/**
+ * The driver wants a bare account identifier. Pasting the console URL instead
+ * fails as ERR_SF_RESPONSE_FAILURE (401002), which looks nothing like a config
+ * error, so tolerate the URL forms.
+ */
+function accountIdentifier(raw: string): string {
+  return raw
+    .trim()
+    .replace(/^https?:\/\//i, '')
+    .replace(/\.snowflakecomputing\.com.*$/i, '')
+    .replace(/\/.*$/, '')
+}
+
 function connect(): Promise<snowflake.Connection> {
   const {
     SNOWFLAKE_ACCOUNT,
@@ -71,7 +84,7 @@ function connect(): Promise<snowflake.Connection> {
   }
 
   const connection = snowflake.createConnection({
-    account: SNOWFLAKE_ACCOUNT,
+    account: accountIdentifier(SNOWFLAKE_ACCOUNT),
     username: SNOWFLAKE_USER,
     password: SNOWFLAKE_PASSWORD,
     warehouse: SNOWFLAKE_WAREHOUSE,
@@ -145,9 +158,16 @@ export default async function handler(req: ApiRequest, res: ApiResponse) {
     const rows = await run(connection, resolved.sql, resolved.binds)
     return res.status(200).json({ rows, rowCount: rows.length })
   } catch (error) {
-    // Snowflake errors can name accounts and objects; log them, don't return them.
+    // Snowflake messages can name accounts and objects, so only the numeric
+    // code goes back to the caller. 390100 bad credentials, 390201 no such
+    // warehouse, 390189 no such role, 401001 could not connect,
+    // 401002 host answered but refused the request. Full message is in the
+    // Vercel runtime log.
+    const { code } = error as { code?: string | number }
     console.error('query failed', error)
-    return res.status(502).json({ error: 'Query failed against Snowflake' })
+    return res
+      .status(502)
+      .json({ error: 'Query failed against Snowflake', code: code ?? null })
   } finally {
     connection?.destroy(() => undefined)
   }
