@@ -33,3 +33,5 @@ dist-ssr
 
 .vercel
 .env*
+# Vercel appends the .env* rule above, which re-ignores the example file.
+!.env.example
