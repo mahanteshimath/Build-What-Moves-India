@@ -212,16 +212,77 @@ ORDER BY TAXPAYERS_AFFECTED DESC;
 
 
 -- ---------------------------------------------------------------------------
+-- Materialise what gets read repeatedly
+--
+-- V_FINDING unions eleven views over the whole corpus. At 5,000 taxpayers that
+-- is instant. At 15 crore it is a billion-row scan, and the app calls it on
+-- every page load through a Vercel Function that gives up after ten seconds.
+--
+-- So the union is paid for once, here, and the app reads the results. Rebuild
+-- these three whenever the seed or the checks change.
+-- ---------------------------------------------------------------------------
+
+-- One row per taxpayer per check that fires. DISTINCT because a taxpayer with
+-- two uncredited challans is still one taxpayer affected by challan-credit.
+CREATE OR REPLACE TABLE FINDING_FLAT AS
+SELECT DISTINCT TAXPAYER_ID, CHECK_CODE, SEVERITY
+FROM V_FINDING;
+
+CREATE OR REPLACE TABLE PREVALENCE_SUMMARY AS
+SELECT CHECK_CODE,
+       ANY_VALUE(SEVERITY) AS SEVERITY,
+       COUNT(*) AS TAXPAYERS_AFFECTED,
+       ROUND(100.0 * COUNT(*) / (SELECT COUNT(*) FROM TAXPAYER), 2) AS PERCENT_OF_CORPUS
+FROM FINDING_FLAT
+GROUP BY CHECK_CODE;
+
+-- TOTAL and DISTINCT_IDS should be equal. They diverge only if the corpus was
+-- loaded more than once, which is how the earlier doubled seed was caught.
+CREATE OR REPLACE TABLE CORPUS_SUMMARY AS
+SELECT COUNT(*) AS TOTAL,
+       COUNT(DISTINCT TAXPAYER_ID) AS DISTINCT_IDS
+FROM TAXPAYER;
+
+-- Which checks land on the same taxpayer. LIFT is how much more often a pair
+-- co-occurs than it would if the two were unrelated, so 1.0 means the pair says
+-- nothing and above 1.0 means the two belong on screen together.
+-- At most 55 rows, from a self-join too large to run per request.
+CREATE OR REPLACE TABLE COOCCURRENCE_SUMMARY AS
+WITH n AS (
+    SELECT TOTAL FROM CORPUS_SUMMARY
+),
+pairs AS (
+    SELECT a.CHECK_CODE AS CHECK_A, b.CHECK_CODE AS CHECK_B, COUNT(*) AS BOTH
+    FROM FINDING_FLAT a
+    JOIN FINDING_FLAT b
+      ON b.TAXPAYER_ID = a.TAXPAYER_ID
+     AND b.CHECK_CODE  > a.CHECK_CODE       -- each unordered pair once, no self-pairs
+    GROUP BY 1, 2
+)
+SELECT p.CHECK_A,
+       p.CHECK_B,
+       p.BOTH                                          AS TAXPAYERS_WITH_BOTH,
+       ROUND(100.0 * p.BOTH / n.TOTAL, 3)              AS PERCENT_OF_CORPUS,
+       ROUND((p.BOTH / n.TOTAL)
+             / ((pa.TAXPAYERS_AFFECTED / n.TOTAL)
+              * (pb.TAXPAYERS_AFFECTED / n.TOTAL)), 2) AS LIFT
+FROM pairs p
+CROSS JOIN n
+JOIN PREVALENCE_SUMMARY pa ON pa.CHECK_CODE = p.CHECK_A
+JOIN PREVALENCE_SUMMARY pb ON pb.CHECK_CODE = p.CHECK_B;
+
+
+-- ---------------------------------------------------------------------------
 -- Verify the checks behave
 -- ---------------------------------------------------------------------------
 
--- Fire rate per check. Compare against the rates documented in 02_seed.sql.
-SELECT * FROM V_PREVALENCE;
+-- Eleven rows, one per check. Ten means a check cannot fire against this seed.
+SELECT * FROM PREVALENCE_SUMMARY ORDER BY TAXPAYERS_AFFECTED DESC;
 
 -- How many taxpayers are clean, and how findings stack up.
 SELECT COALESCE(FINDING_COUNT, 0) AS FINDINGS_PER_TAXPAYER, COUNT(*) AS TAXPAYERS
 FROM TAXPAYER t
-LEFT JOIN (SELECT TAXPAYER_ID, COUNT(*) AS FINDING_COUNT FROM V_FINDING GROUP BY TAXPAYER_ID) f
+LEFT JOIN (SELECT TAXPAYER_ID, COUNT(*) AS FINDING_COUNT FROM FINDING_FLAT GROUP BY TAXPAYER_ID) f
        ON f.TAXPAYER_ID = t.TAXPAYER_ID
 GROUP BY 1 ORDER BY 1;
 

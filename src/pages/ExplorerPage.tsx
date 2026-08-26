@@ -13,8 +13,9 @@ const RELATIONS = [
   { name: 'TAX_CREDIT', label: 'Tax credits' },
   { name: 'SPECIAL_RATE_INCOME', label: 'Income taxed at a special rate' },
   { name: 'NOTICE', label: 'Notices received' },
-  { name: 'V_PREVALENCE', label: 'Summary — how often each problem appeared' },
-  { name: 'V_FINDING', label: 'Every problem found, one line each' },
+  { name: 'PREVALENCE_SUMMARY', label: 'Summary — how often each problem appeared' },
+  { name: 'COOCCURRENCE_SUMMARY', label: 'Summary — which problems turned up together' },
+  { name: 'FINDING_FLAT', label: 'Every problem found, one line each' },
   { name: 'V_THRESHOLD', label: 'The limits each check uses' },
   { name: 'V_SAMPLE_TAXPAYER', label: 'One sample person, start to finish' },
 ]
@@ -22,6 +23,7 @@ const RELATIONS = [
 const NAMED = [
   { name: 'corpusSize', label: 'How many people we tested on' },
   { name: 'prevalence', label: 'How often each problem appeared' },
+  { name: 'cooccurrence', label: 'Which problems turned up together' },
   { name: 'views', label: 'The checks we run' },
   { name: 'tables', label: 'The records we compare' },
 ]
@@ -36,6 +38,10 @@ const COLUMN_LABELS: Record<string, string> = {
   BYTES: 'Size',
   TOTAL: 'Total records',
   DISTINCT_IDS: 'Unique people',
+  CHECK_A: 'One problem',
+  CHECK_B: 'The other problem',
+  TAXPAYERS_WITH_BOTH: 'People with both',
+  LIFT: 'How much more often than chance',
 }
 
 type Row = Record<string, unknown>

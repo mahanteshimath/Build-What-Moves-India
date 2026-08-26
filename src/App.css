@@ -661,3 +661,167 @@
 
 .table th { background: var(--wash); font-weight: 600; }
 .table tbody tr:hover { background: var(--wash); }
+
+/* ---- Brief simulator --------------------------------------------------- */
+
+.sim__head {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sim__head .panel__heading {
+  display: flex;
+  gap: 0.45rem;
+  align-items: center;
+  margin-bottom: 0;
+}
+
+.sim__head .button {
+  display: inline-flex;
+  gap: 0.4rem;
+  align-items: center;
+}
+
+.sim__banner {
+  margin: 0 0 1rem;
+  padding: 0.7rem 0.85rem;
+  border-radius: 10px;
+  background: var(--amber-soft);
+  color: var(--amber);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.levers {
+  display: grid;
+  gap: 1.1rem;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 19rem), 1fr));
+}
+
+.lever {
+  display: grid;
+  gap: 0.4rem;
+  align-content: start;
+  padding: 0.85rem 0.95rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: var(--wash);
+}
+
+.lever__label {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem 0.75rem;
+  align-items: baseline;
+  justify-content: space-between;
+  color: var(--muted);
+  font-size: 0.88rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.lever__value {
+  color: var(--ink);
+  font-size: 1rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.lever__range {
+  width: 100%;
+  accent-color: var(--green);
+}
+
+.lever__range:focus-visible { outline: 2px solid var(--green); outline-offset: 3px; }
+
+.lever__snap {
+  justify-self: start;
+  padding: 0.25rem 0.55rem;
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  background: var(--paper);
+  color: var(--green);
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.lever__snap:hover:not(:disabled) { background: var(--green-soft); }
+.lever__snap:disabled { color: var(--muted); cursor: default; }
+
+.lever__foot {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+}
+
+.lever--toggle {
+  display: flex;
+  gap: 0.6rem;
+  align-items: center;
+}
+
+.lever--toggle input {
+  flex: none;
+  width: 1.1rem;
+  height: 1.1rem;
+  accent-color: var(--green);
+}
+
+.lever--toggle label {
+  color: var(--ink);
+  font-size: 0.9rem;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.tally__item--cleared {
+  border-color: var(--green);
+  background: var(--green-soft);
+  color: var(--green);
+}
+
+.finding__status {
+  padding: 0.1rem 0.5rem;
+  border-radius: 999px;
+  background: var(--paper);
+  border: 1px solid currentColor;
+  font-size: 0.75rem;
+  font-weight: 700;
+}
+
+.cleared {
+  margin-top: 1.25rem;
+  padding-top: 1rem;
+  border-top: 1px solid var(--line);
+}
+
+.cleared__heading {
+  margin: 0 0 0.6rem;
+  color: var(--green);
+  font-size: 0.95rem;
+}
+
+.cleared__list {
+  display: grid;
+  gap: 0.4rem;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.cleared__list li {
+  display: flex;
+  gap: 0.5rem;
+  align-items: flex-start;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.45;
+  text-decoration: line-through;
+  text-decoration-color: var(--line);
+}
+
+.cleared__list svg { flex: none; margin-top: 0.15rem; color: var(--green); }

@@ -23,6 +23,12 @@ const TABLES = [
   'TAX_CREDIT',
   'SPECIAL_RATE_INCOME',
   'NOTICE',
+  // Built once by 03_checks.sql. The views they summarise are too large to
+  // scan inside a request once the corpus passes a few million rows.
+  'FINDING_FLAT',
+  'PREVALENCE_SUMMARY',
+  'CORPUS_SUMMARY',
+  'COOCCURRENCE_SUMMARY',
 ] as const
 
 const VIEWS = [
@@ -46,11 +52,14 @@ const NAMED_QUERIES: Record<string, string> = {
           ORDER BY TABLE_NAME`,
 
   prevalence: `SELECT CHECK_CODE, SEVERITY, TAXPAYERS_AFFECTED, PERCENT_OF_CORPUS
-               FROM V_PREVALENCE
+               FROM PREVALENCE_SUMMARY
                ORDER BY TAXPAYERS_AFFECTED DESC`,
 
-  corpusSize: `SELECT COUNT(*) AS TOTAL, COUNT(DISTINCT TAXPAYER_ID) AS DISTINCT_IDS
-               FROM TAXPAYER`,
+  cooccurrence: `SELECT CHECK_A, CHECK_B, TAXPAYERS_WITH_BOTH, PERCENT_OF_CORPUS, LIFT
+                 FROM COOCCURRENCE_SUMMARY
+                 ORDER BY LIFT DESC, TAXPAYERS_WITH_BOTH DESC`,
+
+  corpusSize: `SELECT TOTAL, DISTINCT_IDS FROM CORPUS_SUMMARY`,
 }
 
 snowflake.configure({ logLevel: 'ERROR' })

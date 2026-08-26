@@ -5,17 +5,31 @@ import {
   CircleAlert,
   FileSearch,
   Printer,
+  RotateCcw,
+  SlidersHorizontal,
 } from 'lucide-react'
 import type { DocumentKind, Finding, Severity, TaxDocument } from '../domain/tax'
-import { fingerprintSource, formatDateTime } from '../domain/tax'
+import { fingerprintSource, formatDateTime, formatRupees } from '../domain/tax'
 import { profiles } from '../data/profiles'
 import { checks, reviewProfile } from '../rules/checks'
+import type { Adjustments, FindingStatus } from '../rules/simulate'
+import {
+  aisInterestTotal,
+  applyAdjustments,
+  baselineAdjustments,
+  isBaseline,
+  statusById,
+} from '../rules/simulate'
 
 const severityLabel: Record<Severity, string> = {
   'action-needed': 'Action needed',
   review: 'Review',
   ready: 'Ready',
 }
+
+/** Slider granularity, in paise. */
+const STEP_PAISE = 100_00
+const FILING_SHIFT_LIMIT_MINUTES = 2880
 
 const kindLabel: Record<DocumentKind, string> = {
   'form-16': 'Form 16',
@@ -63,18 +77,101 @@ function useFingerprints(documents: TaxDocument[]): Record<string, string> {
   return prints
 }
 
+function MoneyLever({
+  id,
+  label,
+  value,
+  anchor,
+  anchorLabel,
+  onChange,
+}: {
+  id: string
+  label: string
+  value: number
+  anchor: number
+  anchorLabel: string
+  onChange: (next: number) => void
+}) {
+  const ceiling = Math.max(anchor * 2, value * 2, 5_000_00)
+  const max = Math.ceil(ceiling / STEP_PAISE) * STEP_PAISE
+
+  return (
+    <div className="lever">
+      <label className="lever__label" htmlFor={id}>
+        <span>{label}</span>
+        <strong className="lever__value">{formatRupees(value)}</strong>
+      </label>
+      <input
+        id={id}
+        className="lever__range"
+        type="range"
+        min={0}
+        max={max}
+        step={STEP_PAISE}
+        value={value}
+        onChange={(event) => onChange(Number(event.target.value))}
+      />
+      <button
+        type="button"
+        className="lever__snap"
+        onClick={() => onChange(anchor)}
+        disabled={value === anchor}
+      >
+        {value === anchor
+          ? `Matches ${anchorLabel}`
+          : `Match ${anchorLabel} — ${formatRupees(anchor)}`}
+      </button>
+    </div>
+  )
+}
+
+function ToggleLever({
+  id,
+  label,
+  checked,
+  onChange,
+}: {
+  id: string
+  label: string
+  checked: boolean
+  onChange: (next: boolean) => void
+}) {
+  return (
+    <div className="lever lever--toggle">
+      <input
+        id={id}
+        type="checkbox"
+        checked={checked}
+        onChange={(event) => onChange(event.target.checked)}
+      />
+      <label htmlFor={id}>{label}</label>
+    </div>
+  )
+}
+
+const statusLabel: Record<FindingStatus, string> = {
+  carried: 'Unchanged by your edit',
+  cleared: 'Cleared by your edit',
+  raised: 'Raised by your edit',
+}
+
 function FindingCard({
   finding,
   documentLabels,
+  status,
 }: {
   finding: Finding
   documentLabels: Map<string, string>
+  status?: FindingStatus
 }) {
   return (
     <li className={`finding finding--${finding.severity}`}>
       <p className="finding__chip">
         <SeverityIcon severity={finding.severity} />
         {severityLabel[finding.severity]}
+        {status === 'raised' && (
+          <span className="finding__status">{statusLabel.raised}</span>
+        )}
       </p>
       <h3 className="finding__title">{finding.title}</h3>
       <p className="finding__detail">{finding.detail}</p>
@@ -127,12 +224,31 @@ function FindingCard({
 
 export default function BriefPage() {
   const [selectedId, setSelectedId] = useState(profiles[0].id)
+  const [adjustments, setAdjustments] = useState<Adjustments>(() =>
+    baselineAdjustments(profiles[0]),
+  )
 
   const profile = useMemo(
     () => profiles.find((item) => item.id === selectedId) ?? profiles[0],
     [selectedId],
   )
-  const findings = useMemo(() => reviewProfile(profile), [profile])
+
+  const simulated = useMemo(
+    () => applyAdjustments(profile, adjustments),
+    [profile, adjustments],
+  )
+  const baseFindings = useMemo(() => reviewProfile(profile), [profile])
+  const findings = useMemo(() => reviewProfile(simulated), [simulated])
+  const status = useMemo(
+    () => statusById(baseFindings, findings),
+    [baseFindings, findings],
+  )
+  const cleared = useMemo(
+    () => baseFindings.filter((f) => status.get(f.id) === 'cleared'),
+    [baseFindings, status],
+  )
+  const atBaseline = isBaseline(profile, adjustments)
+
   const fingerprints = useFingerprints(profile.documents)
 
   const documentLabels = useMemo(
@@ -148,6 +264,9 @@ export default function BriefPage() {
     [findings],
   )
 
+  const update = (patch: Partial<Adjustments>) =>
+    setAdjustments((current) => ({ ...current, ...patch }))
+
   return (
     <>
       <section className="panel no-print" aria-labelledby="picker-heading">
@@ -161,7 +280,10 @@ export default function BriefPage() {
               type="button"
               className="picker__item"
               aria-pressed={item.id === profile.id}
-              onClick={() => setSelectedId(item.id)}
+              onClick={() => {
+                setSelectedId(item.id)
+                setAdjustments(baselineAdjustments(item))
+              }}
             >
               {item.personaLabel}
             </button>
@@ -200,6 +322,12 @@ export default function BriefPage() {
             <dt>Review</dt>
             <dd>{counts.review}</dd>
           </div>
+          {cleared.length > 0 && (
+            <div className="tally__item tally__item--cleared">
+              <dt>Cleared by your edit</dt>
+              <dd>{cleared.length}</dd>
+            </div>
+          )}
           <div className="tally__item tally__item--ready">
             <dt>Checks run</dt>
             <dd>{checks.length}</dd>
@@ -213,19 +341,137 @@ export default function BriefPage() {
         </p>
       </section>
 
+      <section className="panel no-print" aria-labelledby="sim-heading">
+        <div className="sim__head">
+          <h2 className="panel__heading" id="sim-heading">
+            <SlidersHorizontal aria-hidden size={18} /> Try a change
+          </h2>
+          <button
+            type="button"
+            className="button button--quiet"
+            onClick={() => setAdjustments(baselineAdjustments(profile))}
+            disabled={atBaseline}
+          >
+            <RotateCcw aria-hidden size={15} /> Back to the record
+          </button>
+        </div>
+        <p className="panel__note">
+          Move a value and the same {checks.length} checks re-run below, in this
+          browser, against an edited copy. Nothing here is filed, sent or saved,
+          and a cleared check only means two records now agree &mdash; it is not
+          a prediction of any tax outcome.
+        </p>
+
+        <div className="levers">
+          <MoneyLever
+            id="lever-claimed-tds"
+            label="Tax deducted claimed in the return"
+            value={adjustments.claimedTdsPaise}
+            anchor={profile.form26asTdsPaise}
+            anchorLabel="Form 26AS"
+            onChange={(claimedTdsPaise) => update({ claimedTdsPaise })}
+          />
+
+          <MoneyLever
+            id="lever-interest"
+            label="Interest income declared in the return"
+            value={adjustments.declaredInterestPaise}
+            anchor={aisInterestTotal(profile)}
+            anchorLabel="AIS total"
+            onChange={(declaredInterestPaise) => update({ declaredInterestPaise })}
+          />
+
+          <MoneyLever
+            id="lever-refund"
+            label="Refund claimed"
+            value={adjustments.refundClaimedPaise}
+            anchor={0}
+            anchorLabel="no refund"
+            onChange={(refundClaimedPaise) => update({ refundClaimedPaise })}
+          />
+
+          {profile.filedOn && (
+            <div className="lever">
+              <label className="lever__label" htmlFor="lever-filed">
+                <span>Submission timestamp</span>
+                <strong className="lever__value">
+                  {formatDateTime(simulated.filedOn ?? profile.filedOn)}
+                </strong>
+              </label>
+              <input
+                id="lever-filed"
+                className="lever__range"
+                type="range"
+                min={-FILING_SHIFT_LIMIT_MINUTES}
+                max={FILING_SHIFT_LIMIT_MINUTES}
+                step={15}
+                value={adjustments.filedShiftMinutes}
+                onChange={(event) =>
+                  update({ filedShiftMinutes: Number(event.target.value) })
+                }
+              />
+              <p className="lever__foot">
+                Due date on record: {formatDateTime(profile.dueDate)}
+              </p>
+            </div>
+          )}
+
+          {profile.challans.length > 0 && (
+            <ToggleLever
+              id="lever-credited"
+              label="The taxes-paid schedule lists every challan I paid"
+              checked={adjustments.challansCredited}
+              onChange={(challansCredited) => update({ challansCredited })}
+            />
+          )}
+
+          {profile.filedOn && (
+            <ToggleLever
+              id="lever-everified"
+              label="The return carries an e-verification date"
+              checked={adjustments.everified}
+              onChange={(everified) => update({ everified })}
+            />
+          )}
+        </div>
+      </section>
+
       <section className="panel" aria-labelledby="findings-heading">
         <h2 className="panel__heading" id="findings-heading">
           What the records show
         </h2>
+        {!atBaseline && (
+          <p className="sim__banner">
+            <strong>Simulated copy.</strong> These findings come from an edited
+            version of the sample record, not from the record as it stands.
+          </p>
+        )}
         <ol className="findings">
           {findings.map((finding) => (
             <FindingCard
               key={finding.id}
               finding={finding}
               documentLabels={documentLabels}
+              status={status.get(finding.id)}
             />
           ))}
         </ol>
+
+        {cleared.length > 0 && (
+          <div className="cleared">
+            <h3 className="cleared__heading">
+              No longer flagged, after your edit
+            </h3>
+            <ul className="cleared__list">
+              {cleared.map((finding) => (
+                <li key={finding.id}>
+                  <CheckCircle2 aria-hidden size={16} />
+                  {finding.title}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
       </section>
 
       <section className="panel" aria-labelledby="ledger-heading">
