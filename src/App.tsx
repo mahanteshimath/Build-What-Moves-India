@@ -27,7 +27,7 @@ function TopBar() {
           Brief
         </NavLink>
         <NavLink to="/explorer" className="topbar__link">
-          Snowflake explorer
+          How we tested this
         </NavLink>
       </nav>
       <div className="topbar__account">
@@ -61,15 +61,17 @@ export default function App() {
           </h1>
           <p className="standfirst">
             When an automated system and your own paperwork disagree, the burden
-            of proof lands on you. Sakshya assembles your side of the record for
-            Income Tax e-Filing &mdash; {checks.length} deterministic checks, a
-            fingerprinted document ledger, and a brief you can print.
+            of proof lands on you. Sakshya puts your side of the record
+            together for Income Tax e-Filing &mdash; {checks.length} checks that
+            work the same way every time, a tamper-evident list of your
+            documents, and a one-page summary you can print and carry.
           </p>
           <p className="privacy">
             <ShieldCheck aria-hidden size={16} />
-            The brief is computed in this browser from synthetic records and is
-            never uploaded. The Snowflake explorer is the one exception: it asks
-            this site&rsquo;s own server to run a fixed, named query.
+            Your summary is worked out inside this browser and never leaves your
+            device. The one exception is the &ldquo;How we tested this&rdquo;
+            page, which asks our own server for figures about our practice data
+            &mdash; never about you.
           </p>
         </div>
       </header>

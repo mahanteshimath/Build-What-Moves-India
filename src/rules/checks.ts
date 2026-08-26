@@ -22,7 +22,7 @@ const challanCredit: Check = (profile) =>
         {
           id: `challan-missing-${challan.cin}`,
           severity: 'action-needed',
-          title: `${kindLabel} challan is not in the taxes-paid schedule`,
+          title: `${kindLabel} you paid is missing from the return`,
           detail: `The challan receipt records ${formatRupees(challan.amountPaise)} paid on ${formatDateTime(challan.paidAt)}. The return's taxes-paid schedule lists no entry for this CIN.`,
           documentIds: [challan.documentId],
           source: portalHome,
@@ -43,7 +43,7 @@ const challanCredit: Check = (profile) =>
         {
           id: `challan-amount-${challan.cin}`,
           severity: 'action-needed',
-          title: `${kindLabel} challan amount differs from the schedule`,
+          title: `${kindLabel}: the receipt and the return show different amounts`,
           detail: `The challan receipt and the taxes-paid schedule record different amounts for CIN ${challan.cin}.`,
           documentIds: [challan.documentId],
           source: portalHome,
@@ -81,7 +81,7 @@ const deadlineGap: Check = (profile) => {
     {
       id: 'deadline-gap',
       severity: 'action-needed',
-      title: 'Tax was paid before the due date, the return was submitted after it',
+      title: 'You paid the tax before the due date, but the return went in after it',
       detail: `The challan records payment at ${formatDateTime(paidInTime.paidAt)}, which is before the due date. The return records submission at ${formatDateTime(profile.filedOn)}, a gap of ${gapBetween(paidInTime.paidAt, profile.filedOn)}. ${RESEARCH_NOTE}`,
       documentIds: [paidInTime.documentId],
       source: portalHome,
@@ -112,7 +112,7 @@ const rebateOnSpecialRate: Check = (profile) => {
     {
       id: 'rebate-special-rate',
       severity: 'review',
-      title: 'Rebate claimed alongside special-rate income',
+      title: 'A rebate was claimed even though some income is taxed at a special rate',
       detail: `The return claims a rebate of ${formatRupees(profile.rebateClaimedPaise)} and also reports income taxed at special rates (${sections}). Research notes record returns in this shape being processed differently from the preparation utility. ${RESEARCH_NOTE} Keep the draft computation sheet, so both figures stay on record.`,
       documentIds: profile.documents
         .filter((document) => document.kind === 'return' || document.kind === 'ais')
@@ -137,7 +137,7 @@ const tdsMatch: Check = (profile) => {
     {
       id: 'tds-form16-vs-26as',
       severity: 'action-needed',
-      title: 'Form 16 and Form 26AS report different TDS',
+      title: 'Form 16 and Form 26AS show different amounts of tax deducted',
       detail:
         'The employer statement and the tax credit statement record different amounts of tax deducted for the same year.',
       documentIds: profile.documents
@@ -166,7 +166,7 @@ const claimedTds: Check = (profile) => {
     {
       id: 'tds-claimed-vs-26as',
       severity: 'action-needed',
-      title: 'TDS claimed in the return differs from Form 26AS',
+      title: 'The tax deducted claimed in the return does not match Form 26AS',
       detail:
         'The amount of tax deducted claimed in the return does not match the amount shown in the tax credit statement.',
       documentIds: profile.documents
@@ -198,7 +198,7 @@ const npsCap: Check = (profile) => {
     {
       id: 'nps-cap',
       severity: 'action-needed',
-      title: 'Employer contribution claim exceeds the Form 16 stated cap',
+      title: 'The employer contribution claimed is higher than Form 16 states',
       detail: `The return claims ${profile.npsClaimPercent}% of salary as an employer contribution deduction. The Form 16 field states ${profile.form16NpsCapPercent}%. These two records disagree.`,
       documentIds: profile.documents
         .filter((document) => document.kind === 'form-16')
@@ -227,7 +227,7 @@ const aisDuplicates: Check = (profile) => {
       return {
         id: `ais-duplicate-${payer}-${reportedOn}`,
         severity: 'action-needed',
-        title: 'Repeated entry in the Annual Information Statement',
+        title: 'The same interest entry appears more than once in the AIS',
         detail: `${count} entries share the same payer, amount and reported date: ${payer}, ${formatRupees(Number(amountPaise))}, reported ${formatDate(reportedOn)}. A payer-issued certificate for this deposit shows what was actually credited.`,
         documentIds: profile.documents
           .filter((document) => document.kind === 'ais')
@@ -253,7 +253,7 @@ const interestDeclared: Check = (profile) => {
     {
       id: 'interest-total',
       severity: 'review',
-      title: 'Interest total in the return differs from the AIS total',
+      title: 'The interest total in the return does not match the AIS total',
       detail:
         'The interest income declared in the return does not equal the sum of interest entries reported in the Annual Information Statement.',
       documentIds: profile.documents
@@ -278,7 +278,7 @@ const everification: Check = (profile) => {
     {
       id: 'everification-pending',
       severity: 'action-needed',
-      title: 'Return submitted, no verification date recorded',
+      title: 'The return was submitted, but no e-verification date is recorded',
       detail: `The return records a submission date of ${formatDate(profile.filedOn)}. No e-verification date is recorded. Official guidance describes a ${EVERIFICATION_WINDOW_DAYS}-day e-verification window after submission.`,
       documentIds: profile.documents
         .filter((document) => document.kind === 'return')
@@ -300,7 +300,7 @@ const refundBand: Check = (profile) => {
     {
       id: 'refund-band',
       severity: 'review',
-      title: 'Refund claimed is above the documented review band',
+      title: 'The refund claimed is above the threshold in our research notes',
       detail: `The return claims a refund of ${formatRupees(profile.refundClaimedPaise)}, which is above the ${formatRupees(REFUND_REVIEW_BAND_PAISE)} band that research notes associate with longer automated review. ${RESEARCH_NOTE} Keep the deduction evidence together while the return is in the processing queue.`,
       documentIds: profile.documents
         .filter((document) => document.kind === 'return')

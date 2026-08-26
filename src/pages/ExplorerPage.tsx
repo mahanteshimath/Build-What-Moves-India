@@ -1,32 +1,51 @@
 import { useCallback, useState } from 'react'
 import { CircleAlert, Database } from 'lucide-react'
 
-// Must stay in step with the allowlist in api/query.ts. Sending anything else
-// gets a 400 from the server, which is the point.
+// The `name` values must stay in step with the allowlist in api/query.ts.
+// Sending anything else gets a 400 from the server, which is the point.
 const RELATIONS = [
-  'TAXPAYER',
-  'FORM16',
-  'FORM26AS',
-  'RETURN_CLAIM',
-  'AIS_INTEREST',
-  'CHALLAN',
-  'TAX_CREDIT',
-  'SPECIAL_RATE_INCOME',
-  'NOTICE',
-  'V_PREVALENCE',
-  'V_FINDING',
-  'V_THRESHOLD',
-  'V_SAMPLE_TAXPAYER',
+  { name: 'TAXPAYER', label: 'The people in our practice set' },
+  { name: 'FORM16', label: 'Form 16 — salary and tax deducted, from the employer' },
+  { name: 'FORM26AS', label: 'Form 26AS — tax actually credited against the PAN' },
+  { name: 'RETURN_CLAIM', label: 'What was claimed in the return' },
+  { name: 'AIS_INTEREST', label: 'Interest income reported by banks' },
+  { name: 'CHALLAN', label: 'Tax payment receipts (challans)' },
+  { name: 'TAX_CREDIT', label: 'Tax credits' },
+  { name: 'SPECIAL_RATE_INCOME', label: 'Income taxed at a special rate' },
+  { name: 'NOTICE', label: 'Notices received' },
+  { name: 'V_PREVALENCE', label: 'Summary — how often each problem appeared' },
+  { name: 'V_FINDING', label: 'Every problem found, one line each' },
+  { name: 'V_THRESHOLD', label: 'The limits each check uses' },
+  { name: 'V_SAMPLE_TAXPAYER', label: 'One sample person, start to finish' },
 ]
 
 const NAMED = [
-  { name: 'tables', label: 'Tables' },
-  { name: 'views', label: 'Views' },
-  { name: 'prevalence', label: 'Check prevalence' },
-  { name: 'corpusSize', label: 'Corpus size' },
+  { name: 'corpusSize', label: 'How many people we tested on' },
+  { name: 'prevalence', label: 'How often each problem appeared' },
+  { name: 'views', label: 'The checks we run' },
+  { name: 'tables', label: 'The records we compare' },
 ]
 
+const COLUMN_LABELS: Record<string, string> = {
+  CHECK_CODE: 'Check',
+  SEVERITY: 'How serious',
+  TAXPAYERS_AFFECTED: 'People affected',
+  PERCENT_OF_CORPUS: 'Share of practice set',
+  TABLE_NAME: 'Name',
+  ROW_COUNT: 'Records',
+  BYTES: 'Size',
+  TOTAL: 'Total records',
+  DISTINCT_IDS: 'Unique people',
+}
+
 type Row = Record<string, unknown>
+
+function columnLabel(name: string): string {
+  const known = COLUMN_LABELS[name]
+  if (known) return known
+  const words = name.replace(/_/g, ' ').toLowerCase()
+  return words.charAt(0).toUpperCase() + words.slice(1)
+}
 
 function cell(value: unknown): string {
   if (value === null || value === undefined) return '—'
@@ -40,7 +59,7 @@ export default function ExplorerPage() {
   const [caption, setCaption] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [busy, setBusy] = useState(false)
-  const [relation, setRelation] = useState(RELATIONS[0])
+  const [relation, setRelation] = useState(RELATIONS[0].name)
 
   const send = useCallback(async (body: Record<string, unknown>, label: string) => {
     setBusy(true)
@@ -78,13 +97,19 @@ export default function ExplorerPage() {
     <>
       <section className="panel" aria-labelledby="explorer-heading">
         <h2 className="panel__heading" id="explorer-heading">
-          <Database aria-hidden size={19} /> Snowflake explorer
+          <Database aria-hidden size={19} /> How we tested this
         </h2>
         <p className="panel__note">
-          Runs against the synthetic corpus built by the scripts in{' '}
-          <code>snowflake/</code>. The browser sends a query <em>name</em>; the
-          server holds the SQL and the credentials. Arbitrary SQL is not
-          accepted, because this endpoint is reachable without signing in.
+          Before you trust the checks, here is the proof they work. We ran every
+          check against a practice set of made-up taxpayer files and kept a
+          record of what happened. You can look at any part of it below.
+        </p>
+        <p className="callout callout--warn">
+          <CircleAlert aria-hidden size={17} />
+          <span>
+            Everything here is invented for testing. These are not real people,
+            and the percentages below are not real figures about India.
+          </span>
         </p>
 
         <div className="toolbar">
@@ -103,15 +128,15 @@ export default function ExplorerPage() {
 
         <div className="toolbar">
           <label className="field field--inline">
-            <span className="field__label">Preview a relation</span>
+            <span className="field__label">Or look at one set of records</span>
             <select
               className="field__input"
               value={relation}
               onChange={(event) => setRelation(event.target.value)}
             >
-              {RELATIONS.map((name) => (
-                <option key={name} value={name}>
-                  {name}
+              {RELATIONS.map((item) => (
+                <option key={item.name} value={item.name}>
+                  {item.label}
                 </option>
               ))}
             </select>
@@ -120,35 +145,38 @@ export default function ExplorerPage() {
             type="button"
             className="button"
             disabled={busy}
-            onClick={() =>
-              send({ name: 'preview', relation, limit: 20 }, `${relation} (first 20 rows)`)
-            }
+            onClick={() => {
+              const chosen = RELATIONS.find((item) => item.name === relation)
+              send(
+                { name: 'preview', relation, limit: 20 },
+                `${chosen?.label ?? relation} — first 20`,
+              )
+            }}
           >
-            Preview
+            Show me
           </button>
         </div>
       </section>
 
       <section className="panel" aria-labelledby="result-heading" aria-busy={busy}>
         <h2 className="panel__heading" id="result-heading">
-          {caption ?? 'Result'}
+          {caption ?? 'Results'}
         </h2>
 
-        {busy && <p className="panel__note">Querying Snowflake…</p>}
+        {busy && <p className="panel__note">Fetching…</p>}
 
         {error && (
           <p className="callout callout--warn" role="alert">
             <CircleAlert aria-hidden size={17} />
             <span>
-              {error} If this says the query failed, the most likely causes are
-              that the Snowflake environment variables are not set on the
-              deployment, or the warehouse is suspended.
+              We could not fetch the results just now. Please try again in a
+              moment. Nothing on your side has gone wrong.
             </span>
           </p>
         )}
 
         {!busy && !error && rows.length === 0 && (
-          <p className="panel__note">Choose a query above.</p>
+          <p className="panel__note">Pick one of the buttons above.</p>
         )}
 
         {rows.length > 0 && (
@@ -158,7 +186,7 @@ export default function ExplorerPage() {
                 <tr>
                   {columns.map((name) => (
                     <th key={name} scope="col">
-                      {name}
+                      {columnLabel(name)}
                     </th>
                   ))}
                 </tr>

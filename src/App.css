@@ -157,6 +157,20 @@
   font-size: 0.85rem;
 }
 
+.case__sample {
+  margin: 1rem 0 0;
+  padding: 0.7rem 0.9rem;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  color: var(--muted);
+  font-size: 0.88rem;
+  line-height: 1.6;
+}
+
+.case__sample strong {
+  color: var(--ink);
+}
+
 .print-button {
   display: inline-flex;
   gap: 0.45rem;
@@ -491,6 +505,19 @@
   .compare {
     background: transparent;
     break-inside: avoid;
+  }
+
+  /* A link on paper is useless without its address. */
+  .finding__source::after,
+  .footer__links a::after {
+    content: ' — ' attr(href);
+    font-size: 0.8em;
+    word-break: break-all;
+  }
+
+  .case__sample {
+    border: 1.5px solid #000;
+    color: #000;
   }
 
   .ledger__kind {

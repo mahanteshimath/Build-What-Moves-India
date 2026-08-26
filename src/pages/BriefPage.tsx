@@ -152,7 +152,7 @@ export default function BriefPage() {
     <>
       <section className="panel no-print" aria-labelledby="picker-heading">
         <h2 className="panel__heading" id="picker-heading">
-          Choose a situation
+          Which of these sounds like you?
         </h2>
         <nav className="picker">
           {profiles.map((item) => (
@@ -205,6 +205,12 @@ export default function BriefPage() {
             <dd>{checks.length}</dd>
           </div>
         </dl>
+
+        <p className="case__sample">
+          <strong>Sample record.</strong> This brief is built from a made-up
+          example so you can see how it works. It is not a real person&rsquo;s
+          tax record, and it is not tax or legal advice.
+        </p>
       </section>
 
       <section className="panel" aria-labelledby="findings-heading">
