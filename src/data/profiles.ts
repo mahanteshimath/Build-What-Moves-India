@@ -1,0 +1,418 @@
+import type { TaxProfile } from '../domain/tax'
+
+const rupees = (amount: number) => Math.round(amount * 100)
+
+const DUE_DATE = '2026-07-31T23:59:00+05:30'
+
+export const profiles: TaxProfile[] = [
+  {
+    id: 'deadline-payment',
+    personaLabel: 'Priya — salaried, paid on the due date',
+    situation:
+      'Paid self-assessment tax on the evening of 31 July. The taxes-paid schedule stayed empty, so the return was submitted after midnight.',
+    assessmentYear: 'AY 2026-27',
+    documents: [
+      {
+        id: 'p-challan',
+        kind: 'challan',
+        label: 'e-Pay Tax challan receipt',
+        reference: 'CIN 0510308-31072026-00147',
+        capturedAt: '2026-07-31T21:42:00+05:30',
+        note: 'Bank confirmation screen saved as PDF immediately after payment.',
+      },
+      {
+        id: 'p-return',
+        kind: 'return',
+        label: 'ITR-1 acknowledgement',
+        reference: 'ACK 8841200260801',
+        capturedAt: '2026-08-01T00:14:00+05:30',
+        note: 'Submission acknowledgement showing the recorded filing timestamp.',
+      },
+      {
+        id: 'p-form16',
+        kind: 'form-16',
+        label: 'Form 16 Part A',
+        reference: 'TAN BLRP04821C',
+        capturedAt: '2026-06-18T10:05:00+05:30',
+        note: 'Employer-issued statement for the full financial year.',
+      },
+    ],
+    dueDate: DUE_DATE,
+    filedOn: '2026-08-01T00:12:00+05:30',
+    everifiedOn: '2026-08-01T00:31:00+05:30',
+    challans: [
+      {
+        documentId: 'p-challan',
+        kind: 'self-assessment',
+        cin: '0510308-31072026-00147',
+        amountPaise: rupees(42750),
+        paidAt: '2026-07-31T21:40:00+05:30',
+      },
+    ],
+    taxCredits: [],
+    form16TdsPaise: rupees(186400),
+    form26asTdsPaise: rupees(186400),
+    claimedTdsPaise: rupees(186400),
+    aisInterest: [
+      {
+        id: 'p-int-1',
+        payer: 'Canara Bank',
+        amountPaise: rupees(12800),
+        reportedOn: '2026-04-30',
+      },
+    ],
+    declaredInterestPaise: rupees(12800),
+    npsClaimPercent: 10,
+    form16NpsCapPercent: 10,
+    rebateClaimedPaise: 0,
+    specialRateIncome: [],
+    refundClaimedPaise: 0,
+    notice: null,
+  },
+
+  {
+    id: 'rebate-capital-gains',
+    personaLabel: 'Arjun — new regime, has capital gains',
+    situation:
+      'Total income under ₹12 lakh with listed-equity gains. The rebate was accepted while preparing the return.',
+    assessmentYear: 'AY 2026-27',
+    documents: [
+      {
+        id: 'a-return',
+        kind: 'return',
+        label: 'ITR-2 acknowledgement',
+        reference: 'ACK 8839110260722',
+        capturedAt: '2026-07-22T19:20:00+05:30',
+        note: 'Draft computation sheet saved before submission.',
+      },
+      {
+        id: 'a-26as',
+        kind: 'form-26as',
+        label: 'Form 26AS annual statement',
+        reference: 'PAN ****4417F',
+        capturedAt: '2026-07-20T08:40:00+05:30',
+        note: 'Downloaded from the portal on the day the return was prepared.',
+      },
+      {
+        id: 'a-broker',
+        kind: 'ais',
+        label: 'AIS capital gains summary',
+        reference: 'AIS 2026-27 Part B',
+        capturedAt: '2026-07-20T08:52:00+05:30',
+        note: 'Broker-reported equity transactions for the year.',
+      },
+    ],
+    dueDate: DUE_DATE,
+    filedOn: '2026-07-22T19:18:00+05:30',
+    everifiedOn: '2026-07-22T19:44:00+05:30',
+    challans: [],
+    taxCredits: [],
+    form16TdsPaise: rupees(88700),
+    form26asTdsPaise: rupees(88700),
+    claimedTdsPaise: rupees(94200),
+    aisInterest: [
+      {
+        id: 'a-int-1',
+        payer: 'HDFC Bank',
+        amountPaise: rupees(7300),
+        reportedOn: '2026-04-28',
+      },
+    ],
+    declaredInterestPaise: rupees(7300),
+    npsClaimPercent: 10,
+    form16NpsCapPercent: 10,
+    rebateClaimedPaise: rupees(28600),
+    specialRateIncome: [
+      {
+        section: '112A',
+        label: 'Long-term capital gains on listed equity',
+        amountPaise: rupees(210000),
+      },
+      {
+        section: '111A',
+        label: 'Short-term capital gains on listed equity',
+        amountPaise: rupees(45000),
+      },
+    ],
+    refundClaimedPaise: 0,
+    notice: null,
+  },
+
+  {
+    id: 'ais-duplicate',
+    personaLabel: 'Sanjay — duplicated interest in AIS',
+    situation:
+      'Declared interest from bank statements. The AIS shows the same deposit interest twice.',
+    assessmentYear: 'AY 2026-27',
+    documents: [
+      {
+        id: 's-ais',
+        kind: 'ais',
+        label: 'Annual Information Statement',
+        reference: 'AIS 2026-27 Part B — SFT-016',
+        capturedAt: '2026-07-11T12:15:00+05:30',
+        note: 'Downloaded JSON showing reported interest transactions.',
+      },
+      {
+        id: 's-bank',
+        kind: 'form-26as',
+        label: 'Interest certificate',
+        reference: 'Sundaram Finance Ltd, FY 2025-26',
+        capturedAt: '2026-07-11T12:31:00+05:30',
+        note: 'Payer-issued certificate for the deposit in question.',
+      },
+      {
+        id: 's-return',
+        kind: 'return',
+        label: 'ITR-1 draft computation',
+        reference: 'Draft 2026-27',
+        capturedAt: '2026-07-11T13:02:00+05:30',
+        note: 'Income from other sources as entered in the return.',
+      },
+    ],
+    dueDate: DUE_DATE,
+    filedOn: '2026-07-12T11:05:00+05:30',
+    everifiedOn: '2026-07-12T11:22:00+05:30',
+    challans: [],
+    taxCredits: [],
+    form16TdsPaise: rupees(121500),
+    form26asTdsPaise: rupees(121500),
+    claimedTdsPaise: rupees(121500),
+    aisInterest: [
+      {
+        id: 's-int-1',
+        payer: 'Sundaram Finance Ltd',
+        amountPaise: rupees(18450),
+        reportedOn: '2026-05-14',
+      },
+      {
+        id: 's-int-2',
+        payer: 'Sundaram Finance Ltd',
+        amountPaise: rupees(18450),
+        reportedOn: '2026-05-14',
+      },
+      {
+        id: 's-int-3',
+        payer: 'Union Bank of India',
+        amountPaise: rupees(9200),
+        reportedOn: '2026-04-29',
+      },
+    ],
+    declaredInterestPaise: rupees(27650),
+    npsClaimPercent: 10,
+    form16NpsCapPercent: 10,
+    rebateClaimedPaise: 0,
+    specialRateIncome: [],
+    refundClaimedPaise: 0,
+    notice: null,
+  },
+
+  {
+    id: 'notice-response',
+    personaLabel: 'Kavita — defective return notice',
+    situation:
+      'Claimed the higher employer NPS deduction. A notice under section 139(9) arrived with a response deadline.',
+    assessmentYear: 'AY 2026-27',
+    documents: [
+      {
+        id: 'k-notice',
+        kind: 'notice',
+        label: 'Notice under section 139(9)',
+        reference: 'DIN 2026081900412',
+        capturedAt: '2026-08-19T16:40:00+05:30',
+        note: 'Defective return notice received on the portal.',
+      },
+      {
+        id: 'k-form16',
+        kind: 'form-16',
+        label: 'Form 16 Part B',
+        reference: 'TAN PNEK12904D',
+        capturedAt: '2026-06-24T09:10:00+05:30',
+        note: 'Employer statement showing the deduction text field.',
+      },
+      {
+        id: 'k-26as',
+        kind: 'form-26as',
+        label: 'Form 26AS annual statement',
+        reference: 'PAN ****9930K',
+        capturedAt: '2026-07-15T18:05:00+05:30',
+        note: 'Tax credit statement downloaded before filing.',
+      },
+    ],
+    dueDate: DUE_DATE,
+    filedOn: '2026-07-28T14:30:00+05:30',
+    everifiedOn: '2026-07-28T14:55:00+05:30',
+    challans: [],
+    taxCredits: [],
+    form16TdsPaise: rupees(214300),
+    form26asTdsPaise: rupees(209800),
+    claimedTdsPaise: rupees(214300),
+    aisInterest: [
+      {
+        id: 'k-int-1',
+        payer: 'State Bank of India',
+        amountPaise: rupees(15600),
+        reportedOn: '2026-05-02',
+      },
+    ],
+    declaredInterestPaise: rupees(15600),
+    npsClaimPercent: 14,
+    form16NpsCapPercent: 10,
+    rebateClaimedPaise: 0,
+    specialRateIncome: [],
+    refundClaimedPaise: 0,
+    notice: {
+      documentId: 'k-notice',
+      code: '139(9)',
+      title: 'Defective return — employer contribution deduction',
+      respondBy: '2026-09-10T23:59:00+05:30',
+      requiredDocumentIds: ['k-form16', 'k-nps-statement'],
+    },
+  },
+
+  {
+    id: 'refund-review',
+    personaLabel: 'Rohit — large refund, advance tax paid',
+    situation:
+      'Paid advance tax in March and claimed a refund. The advance tax entry did not carry into the return.',
+    assessmentYear: 'AY 2026-27',
+    documents: [
+      {
+        id: 'r-challan',
+        kind: 'challan',
+        label: 'Advance tax challan receipt',
+        reference: 'CIN 0004329-14032026-00082',
+        capturedAt: '2026-03-14T11:26:00+05:30',
+        note: 'Fourth instalment paid through net banking.',
+      },
+      {
+        id: 'r-26as',
+        kind: 'form-26as',
+        label: 'Form 26AS annual statement',
+        reference: 'PAN ****2276M',
+        capturedAt: '2026-07-19T07:45:00+05:30',
+        note: 'Statement listing the advance tax payment.',
+      },
+      {
+        id: 'r-return',
+        kind: 'return',
+        label: 'ITR-2 acknowledgement',
+        reference: 'ACK 8836540260720',
+        capturedAt: '2026-07-20T10:02:00+05:30',
+        note: 'Submitted return awaiting verification.',
+      },
+    ],
+    dueDate: DUE_DATE,
+    filedOn: '2026-07-20T10:00:00+05:30',
+    everifiedOn: null,
+    challans: [
+      {
+        documentId: 'r-challan',
+        kind: 'advance-tax',
+        cin: '0004329-14032026-00082',
+        amountPaise: rupees(35000),
+        paidAt: '2026-03-14T11:24:00+05:30',
+      },
+    ],
+    taxCredits: [],
+    form16TdsPaise: rupees(268900),
+    form26asTdsPaise: rupees(268900),
+    claimedTdsPaise: rupees(268900),
+    aisInterest: [
+      {
+        id: 'r-int-1',
+        payer: 'ICICI Bank',
+        amountPaise: rupees(21400),
+        reportedOn: '2026-04-26',
+      },
+    ],
+    declaredInterestPaise: rupees(21400),
+    npsClaimPercent: 10,
+    form16NpsCapPercent: 10,
+    rebateClaimedPaise: 0,
+    specialRateIncome: [],
+    refundClaimedPaise: rupees(47500),
+    notice: null,
+  },
+
+  {
+    id: 'clean-filing',
+    personaLabel: 'Nandini — every record agrees',
+    situation:
+      'Filed well before the deadline. Each record matches the return as submitted.',
+    assessmentYear: 'AY 2026-27',
+    documents: [
+      {
+        id: 'n-form16',
+        kind: 'form-16',
+        label: 'Form 16 Part A and B',
+        reference: 'TAN MUMN33017A',
+        capturedAt: '2026-06-12T09:30:00+05:30',
+        note: 'Employer statement for the full financial year.',
+      },
+      {
+        id: 'n-26as',
+        kind: 'form-26as',
+        label: 'Form 26AS annual statement',
+        reference: 'PAN ****7781B',
+        capturedAt: '2026-06-28T08:15:00+05:30',
+        note: 'Tax credit statement reconciled against Form 16.',
+      },
+      {
+        id: 'n-challan',
+        kind: 'challan',
+        label: 'Self-assessment challan receipt',
+        reference: 'CIN 0510902-29062026-00311',
+        capturedAt: '2026-06-29T17:22:00+05:30',
+        note: 'Balance tax paid a month before the deadline.',
+      },
+      {
+        id: 'n-return',
+        kind: 'return',
+        label: 'ITR-1 acknowledgement',
+        reference: 'ACK 8830770260630',
+        capturedAt: '2026-06-30T10:12:00+05:30',
+        note: 'Verified submission acknowledgement.',
+      },
+    ],
+    dueDate: DUE_DATE,
+    filedOn: '2026-06-30T10:10:00+05:30',
+    everifiedOn: '2026-06-30T10:26:00+05:30',
+    challans: [
+      {
+        documentId: 'n-challan',
+        kind: 'self-assessment',
+        cin: '0510902-29062026-00311',
+        amountPaise: rupees(18900),
+        paidAt: '2026-06-29T17:20:00+05:30',
+      },
+    ],
+    taxCredits: [{ cin: '0510902-29062026-00311', amountPaise: rupees(18900) }],
+    form16TdsPaise: rupees(164200),
+    form26asTdsPaise: rupees(164200),
+    claimedTdsPaise: rupees(164200),
+    aisInterest: [
+      {
+        id: 'n-int-1',
+        payer: 'Bank of Baroda',
+        amountPaise: rupees(11300),
+        reportedOn: '2026-04-25',
+      },
+    ],
+    declaredInterestPaise: rupees(11300),
+    npsClaimPercent: 10,
+    form16NpsCapPercent: 10,
+    rebateClaimedPaise: 0,
+    specialRateIncome: [],
+    refundClaimedPaise: rupees(8400),
+    notice: null,
+  },
+]
+
+export function profileById(id: string): TaxProfile {
+  const profile = profiles.find((item) => item.id === id)
+  if (!profile) {
+    throw new Error(`Unknown profile: ${id}`)
+  }
+  return profile
+}

@@ -1,0 +1,156 @@
+export type Severity = 'action-needed' | 'review' | 'ready'
+
+export type DocumentKind =
+  | 'form-16'
+  | 'form-26as'
+  | 'ais'
+  | 'challan'
+  | 'return'
+  | 'notice'
+
+export interface OfficialSource {
+  label: string
+  url: string
+}
+
+export interface TaxDocument {
+  id: string
+  kind: DocumentKind
+  label: string
+  reference: string
+  capturedAt: string
+  note: string
+}
+
+export type ChallanKind = 'advance-tax' | 'self-assessment'
+
+export interface Challan {
+  documentId: string
+  kind: ChallanKind
+  cin: string
+  amountPaise: number
+  paidAt: string
+}
+
+/** What the return's taxes-paid schedule shows against a challan identifier. */
+export interface TaxCredit {
+  cin: string
+  amountPaise: number
+}
+
+export interface InterestEntry {
+  id: string
+  payer: string
+  amountPaise: number
+  reportedOn: string
+}
+
+export type SpecialRateSection = '111A' | '112A' | '112' | '115BBH'
+
+export interface SpecialRateIncome {
+  section: SpecialRateSection
+  label: string
+  amountPaise: number
+}
+
+export interface Notice {
+  documentId: string
+  code: string
+  title: string
+  respondBy: string
+  requiredDocumentIds: string[]
+}
+
+export interface TaxProfile {
+  id: string
+  personaLabel: string
+  situation: string
+  assessmentYear: string
+  documents: TaxDocument[]
+
+  dueDate: string
+  filedOn: string | null
+  everifiedOn: string | null
+
+  challans: Challan[]
+  taxCredits: TaxCredit[]
+
+  form16TdsPaise: number
+  form26asTdsPaise: number
+  claimedTdsPaise: number
+
+  aisInterest: InterestEntry[]
+  declaredInterestPaise: number
+
+  npsClaimPercent: number
+  form16NpsCapPercent: number
+
+  rebateClaimedPaise: number
+  specialRateIncome: SpecialRateIncome[]
+
+  refundClaimedPaise: number
+  notice: Notice | null
+}
+
+export interface Comparison {
+  label: string
+  left: { source: string; value: string }
+  right: { source: string; value: string }
+}
+
+export interface Finding {
+  id: string
+  severity: Severity
+  title: string
+  detail: string
+  documentIds: string[]
+  source: OfficialSource
+  comparison?: Comparison
+}
+
+/** Stable text a document's fingerprint is computed over. */
+export function fingerprintSource(document: TaxDocument): string {
+  return [
+    document.kind,
+    document.label,
+    document.reference,
+    document.capturedAt,
+    document.note,
+  ].join('|')
+}
+
+export function formatRupees(paise: number): string {
+  return new Intl.NumberFormat('en-IN', {
+    style: 'currency',
+    currency: 'INR',
+    maximumFractionDigits: 2,
+  }).format(paise / 100)
+}
+
+export function formatDate(iso: string): string {
+  return new Intl.DateTimeFormat('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+  }).format(new Date(iso))
+}
+
+export function formatDateTime(iso: string): string {
+  return new Intl.DateTimeFormat('en-IN', {
+    day: '2-digit',
+    month: 'short',
+    year: 'numeric',
+    hour: '2-digit',
+    minute: '2-digit',
+    hour12: false,
+  }).format(new Date(iso))
+}
+
+/** Whole hours and minutes between two instants, for timeline evidence. */
+export function gapBetween(fromIso: string, toIso: string): string {
+  const minutes = Math.round(
+    (new Date(toIso).getTime() - new Date(fromIso).getTime()) / 60000,
+  )
+  const hours = Math.floor(minutes / 60)
+  return `${hours}h ${minutes % 60}m`
+}
