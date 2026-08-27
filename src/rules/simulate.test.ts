@@ -87,6 +87,39 @@ describe('adjustments clear the finding they address', () => {
     })
     expect(idsOf(simulated)).toContain('everification-pending')
   })
+
+  it('toggling bank pre-validation clears the stalled refund finding', () => {
+    const profile = profileById('bank-preval-stalled')
+    expect(idsOf(profile)).toContain('bank-prevalidation-failed')
+
+    const simulated = applyAdjustments(profile, {
+      ...baselineAdjustments(profile),
+      bankPrevalidated: true,
+    })
+    expect(idsOf(simulated)).not.toContain('bank-prevalidation-failed')
+  })
+
+  it('toggling deductor filed clears unreflected TDS finding', () => {
+    const profile = profileById('unreflected-tds-q4')
+    expect(idsOf(profile)).toContain('tds-unreflected-DELK08192E')
+
+    const simulated = applyAdjustments(profile, {
+      ...baselineAdjustments(profile),
+      deductorFiled: true,
+    })
+    expect(idsOf(simulated)).not.toContain('tds-unreflected-DELK08192E')
+  })
+
+  it('toggling PAN operative status clears the Section 234H finding', () => {
+    const profile = profileById('pan-inoperative-234h')
+    expect(idsOf(profile)).toContain('pan-aadhaar-inoperative')
+
+    const simulated = applyAdjustments(profile, {
+      ...baselineAdjustments(profile),
+      panOperative: true,
+    })
+    expect(idsOf(simulated)).not.toContain('pan-aadhaar-inoperative')
+  })
 })
 
 describe('statusById', () => {

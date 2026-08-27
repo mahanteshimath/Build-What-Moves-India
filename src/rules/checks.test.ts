@@ -6,8 +6,8 @@ const idsFor = (id: string) => reviewProfile(profileById(id)).map((f) => f.id)
 
 describe('profile library', () => {
   it('covers every issue category with a distinct profile', () => {
-    expect(profiles).toHaveLength(6)
-    expect(new Set(profiles.map((p) => p.id)).size).toBe(6)
+    expect(profiles).toHaveLength(9)
+    expect(new Set(profiles.map((p) => p.id)).size).toBe(9)
   })
 
   it('runs every check against every profile without throwing', () => {
@@ -91,6 +91,46 @@ describe('tax deducted at source', () => {
     const ids = idsFor('clean-filing')
     expect(ids).not.toContain('tds-form16-vs-26as')
     expect(ids).not.toContain('tds-claimed-vs-26as')
+  })
+})
+
+describe('unreflected quarterly TDS by deductor', () => {
+  it('identifies deductors who have not uploaded quarterly statements', () => {
+    expect(idsFor('unreflected-tds-q4')).toContain('tds-unreflected-DELK08192E')
+  })
+
+  it('stays silent when all deductors have quarterly statements filed', () => {
+    expect(idsFor('clean-filing')).not.toContain('tds-unreflected-MUMN33017A')
+  })
+})
+
+describe('bank account pre-validation readiness', () => {
+  it('flags a claimed refund where bank account is not pre-validated', () => {
+    expect(idsFor('bank-preval-stalled')).toContain('bank-prevalidation-failed')
+  })
+
+  it('stays silent when bank account is pre-validated with EVC active', () => {
+    expect(idsFor('clean-filing')).not.toContain('bank-prevalidation-failed')
+  })
+})
+
+describe('PAN-Aadhaar operative status', () => {
+  it('flags an inoperative or unlinked PAN under Section 234H', () => {
+    expect(idsFor('pan-inoperative-234h')).toContain('pan-aadhaar-inoperative')
+  })
+
+  it('stays silent when PAN is linked and operative', () => {
+    expect(idsFor('clean-filing')).not.toContain('pan-aadhaar-inoperative')
+  })
+})
+
+describe('Section 245 demand offset', () => {
+  it('flags outstanding tax demand that CPC will adjust against refund', () => {
+    expect(idsFor('refund-review')).toContain('demand-offset-sec245')
+  })
+
+  it('stays silent when no prior outstanding demand exists', () => {
+    expect(idsFor('clean-filing')).not.toContain('demand-offset-sec245')
   })
 })
 

@@ -1,6 +1,13 @@
 import type { Finding, TaxProfile } from '../domain/tax'
 import { formatDate, formatDateTime, formatRupees, gapBetween } from '../domain/tax'
-import { itrFaq, portalHome } from '../data/sources'
+import {
+  aisFaq,
+  everifyFaq,
+  itrFaq,
+  linkAadhaarHelp,
+  portalHome,
+  tdsMismatchHelp,
+} from '../data/sources'
 
 /** Amounts and windows below come from the local research report, not an official page. */
 const RESEARCH_NOTE =
@@ -232,7 +239,7 @@ const aisDuplicates: Check = (profile) => {
         documentIds: profile.documents
           .filter((document) => document.kind === 'ais')
           .map((document) => document.id),
-        source: portalHome,
+        source: aisFaq,
         comparison: {
           label: 'Entries for this payer and date',
           left: { source: 'Annual Information Statement', value: `${count} entries` },
@@ -261,7 +268,7 @@ const interestDeclared: Check = (profile) => {
           (document) => document.kind === 'ais' || document.kind === 'return',
         )
         .map((document) => document.id),
-      source: portalHome,
+      source: aisFaq,
       comparison: {
         label: 'Interest income',
         left: { source: 'Return, declared', value: formatRupees(profile.declaredInterestPaise) },
@@ -283,7 +290,7 @@ const everification: Check = (profile) => {
       documentIds: profile.documents
         .filter((document) => document.kind === 'return')
         .map((document) => document.id),
-      source: itrFaq,
+      source: everifyFaq,
       comparison: {
         label: 'Verification',
         left: { source: 'Submitted on', value: formatDate(profile.filedOn) },
@@ -364,16 +371,145 @@ const noticeEvidence: Check = (profile) => {
   ]
 }
 
+const bankAccountReadiness: Check = (profile) => {
+  if (profile.refundClaimedPaise <= 0 || !profile.bankAccount) return []
+
+  const { bankAccount } = profile
+  const issues: string[] = []
+  if (!bankAccount.preValidated) issues.push('Bank account is not pre-validated')
+  if (!bankAccount.nameMatchedWithPan) issues.push('Account holder name does not match PAN database')
+  if (!bankAccount.evcEnabled) issues.push('Electronic Verification Code (EVC) is not active')
+
+  if (issues.length === 0) return []
+
+  return [
+    {
+      id: 'bank-prevalidation-failed',
+      severity: 'action-needed',
+      title: 'Refund account pre-validation or name matching is pending',
+      detail: `A refund of ${formatRupees(profile.refundClaimedPaise)} is claimed to ${bankAccount.bankName} (${bankAccount.accountMasked}), but portal readiness checks failed: ${issues.join(', ')}. Without pre-validation, the Centralised Processing Centre (CPC) cannot issue the refund credit.`,
+      documentIds: profile.documents
+        .filter((document) => document.kind === 'return')
+        .map((document) => document.id),
+      source: portalHome,
+      comparison: {
+        label: 'Bank refund readiness',
+        left: {
+          source: 'Account details',
+          value: `${bankAccount.bankName} (${bankAccount.accountMasked})`,
+        },
+        right: {
+          source: 'Readiness status',
+          value: issues.join(' | '),
+        },
+      },
+    },
+  ]
+}
+
+const panAadhaarOperative: Check = (profile) => {
+  if (!profile.panAadhaar) return []
+
+  const { panAadhaar } = profile
+  if (panAadhaar.operative && panAadhaar.linked) return []
+
+  return [
+    {
+      id: 'pan-aadhaar-inoperative',
+      severity: 'action-needed',
+      title: 'PAN-Aadhaar linkage is unconfirmed or marked inoperative (Section 234H)',
+      detail: `Portal record as of ${formatDate(panAadhaar.lastCheckedDate)} indicates PAN is ${panAadhaar.linked ? 'linked but inoperative' : 'not linked'}. Under Section 234H, inoperative PANs are subject to higher TDS deductions and processing holds.`,
+      documentIds: profile.documents
+        .filter((document) => document.kind === 'return' || document.kind === 'form-26as')
+        .map((document) => document.id),
+      source: linkAadhaarHelp,
+      comparison: {
+        label: 'PAN linkage status',
+        left: {
+          source: 'Linked status',
+          value: panAadhaar.linked ? 'Linked' : 'Not linked',
+        },
+        right: {
+          source: 'Operative status',
+          value: panAadhaar.operative ? 'Operative' : 'Inoperative',
+        },
+      },
+    },
+  ]
+}
+
+const unreflectedTdsQuarter: Check = (profile) => {
+  if (!profile.deductors || profile.deductors.length === 0) return []
+
+  const missingQuarters = profile.deductors.filter((d) => !d.form16QuarterlyFiled)
+  if (missingQuarters.length === 0) return []
+
+  return missingQuarters.map((d) => ({
+    id: `tds-unreflected-${d.tan}`,
+    severity: 'action-needed',
+    title: `TDS deducted by ${d.deductorName} is not yet filed by the deductor (TAN: ${d.tan})`,
+    detail: `Employer/deductor ${d.deductorName} withheld ${formatRupees(d.amountPaise)} in TDS as recorded in Form 16, but has not uploaded the quarterly TDS return (Form 24Q/26Q) to TRACES. The credit is absent from Form 26AS.`,
+    documentIds: profile.documents
+      .filter((document) => document.kind === 'form-16' || document.kind === 'form-26as')
+      .map((document) => document.id),
+    source: tdsMismatchHelp,
+    comparison: {
+      label: 'Deductor quarterly filing',
+      left: {
+        source: 'Form 16 Part A',
+        value: `${d.tan} — ${formatRupees(d.amountPaise)}`,
+      },
+      right: {
+        source: 'TRACES 26AS Status',
+        value: 'Statement not filed by deductor',
+      },
+    },
+  }))
+}
+
+const demandOffsetLedger: Check = (profile) => {
+  if (!profile.outstandingDemandPaise || profile.outstandingDemandPaise <= 0) return []
+  if (profile.refundClaimedPaise <= 0) return []
+
+  return [
+    {
+      id: 'demand-offset-sec245',
+      severity: 'review',
+      title: 'Claimed refund is subject to automated set-off under Section 245(2)',
+      detail: `The return claims a refund of ${formatRupees(profile.refundClaimedPaise)}, but there is an existing outstanding demand of ${formatRupees(profile.outstandingDemandPaise)} from a prior assessment year on record. CPC automated processing will propose adjustment before disbursing refund balances.`,
+      documentIds: profile.documents
+        .filter((document) => document.kind === 'return')
+        .map((document) => document.id),
+      source: portalHome,
+      comparison: {
+        label: 'Section 245 proposed set-off',
+        left: {
+          source: 'Claimed refund',
+          value: formatRupees(profile.refundClaimedPaise),
+        },
+        right: {
+          source: 'Outstanding demand',
+          value: formatRupees(profile.outstandingDemandPaise),
+        },
+      },
+    },
+  ]
+}
+
 export const checks: Check[] = [
   challanCredit,
   deadlineGap,
   rebateOnSpecialRate,
   tdsMatch,
   claimedTds,
+  unreflectedTdsQuarter,
   npsCap,
   aisDuplicates,
   interestDeclared,
   everification,
+  bankAccountReadiness,
+  panAadhaarOperative,
+  demandOffsetLedger,
   refundBand,
   noticeEvidence,
 ]

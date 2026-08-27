@@ -53,6 +53,14 @@ export const profiles: TaxProfile[] = [
     form16TdsPaise: rupees(186400),
     form26asTdsPaise: rupees(186400),
     claimedTdsPaise: rupees(186400),
+    deductors: [
+      {
+        tan: 'BLRP04821C',
+        deductorName: 'Infosense Technologies Pvt Ltd',
+        form16QuarterlyFiled: true,
+        amountPaise: rupees(186400),
+      },
+    ],
     aisInterest: [
       {
         id: 'p-int-1',
@@ -67,6 +75,19 @@ export const profiles: TaxProfile[] = [
     rebateClaimedPaise: 0,
     specialRateIncome: [],
     refundClaimedPaise: 0,
+    bankAccount: {
+      bankName: 'Canara Bank',
+      accountMasked: '****4409',
+      ifsc: 'CNRB0002104',
+      preValidated: true,
+      evcEnabled: true,
+      nameMatchedWithPan: true,
+    },
+    panAadhaar: {
+      linked: true,
+      operative: true,
+      lastCheckedDate: '2026-06-01',
+    },
     notice: null,
   },
 
@@ -110,6 +131,14 @@ export const profiles: TaxProfile[] = [
     form16TdsPaise: rupees(88700),
     form26asTdsPaise: rupees(88700),
     claimedTdsPaise: rupees(94200),
+    deductors: [
+      {
+        tan: 'MUMK99012D',
+        deductorName: 'Vertex Capital Advisory',
+        form16QuarterlyFiled: true,
+        amountPaise: rupees(88700),
+      },
+    ],
     aisInterest: [
       {
         id: 'a-int-1',
@@ -135,6 +164,19 @@ export const profiles: TaxProfile[] = [
       },
     ],
     refundClaimedPaise: 0,
+    bankAccount: {
+      bankName: 'HDFC Bank',
+      accountMasked: '****9182',
+      ifsc: 'HDFC0000128',
+      preValidated: true,
+      evcEnabled: true,
+      nameMatchedWithPan: true,
+    },
+    panAadhaar: {
+      linked: true,
+      operative: true,
+      lastCheckedDate: '2026-06-15',
+    },
     notice: null,
   },
 
@@ -178,6 +220,14 @@ export const profiles: TaxProfile[] = [
     form16TdsPaise: rupees(121500),
     form26asTdsPaise: rupees(121500),
     claimedTdsPaise: rupees(121500),
+    deductors: [
+      {
+        tan: 'CHNS00114K',
+        deductorName: 'Sundaram Finance Ltd',
+        form16QuarterlyFiled: true,
+        amountPaise: rupees(121500),
+      },
+    ],
     aisInterest: [
       {
         id: 's-int-1',
@@ -204,6 +254,245 @@ export const profiles: TaxProfile[] = [
     rebateClaimedPaise: 0,
     specialRateIncome: [],
     refundClaimedPaise: 0,
+    bankAccount: {
+      bankName: 'Union Bank of India',
+      accountMasked: '****6231',
+      ifsc: 'UBIN0532104',
+      preValidated: true,
+      evcEnabled: true,
+      nameMatchedWithPan: true,
+    },
+    panAadhaar: {
+      linked: true,
+      operative: true,
+      lastCheckedDate: '2026-05-20',
+    },
+    notice: null,
+  },
+
+  {
+    id: 'unreflected-tds-q4',
+    personaLabel: 'Karan — unreflected Q4 TDS in 26AS',
+    situation:
+      'Employer issued Form 16 showing full TDS, but delayed filing Q4 Form 24Q. Form 26AS is short by ₹42,000.',
+    assessmentYear: 'AY 2026-27',
+    documents: [
+      {
+        id: 'kv-form16',
+        kind: 'form-16',
+        label: 'Form 16 Part A',
+        reference: 'TAN DELK08192E',
+        capturedAt: '2026-06-25T11:00:00+05:30',
+        note: 'Employer annual certificate showing ₹2,40,000 total tax deducted.',
+      },
+      {
+        id: 'kv-26as',
+        kind: 'form-26as',
+        label: 'Form 26AS tax credit statement',
+        reference: 'PAN ****1190R',
+        capturedAt: '2026-07-28T09:30:00+05:30',
+        note: 'TRACES statement showing only Q1-Q3 credits totaling ₹1,98,000.',
+      },
+      {
+        id: 'kv-return',
+        kind: 'return',
+        label: 'ITR-1 draft return',
+        reference: 'ACK 8840991260729',
+        capturedAt: '2026-07-29T14:10:00+05:30',
+        note: 'Return claiming full TDS as per Form 16.',
+      },
+    ],
+    dueDate: DUE_DATE,
+    filedOn: '2026-07-29T14:15:00+05:30',
+    everifiedOn: '2026-07-29T14:35:00+05:30',
+    challans: [],
+    taxCredits: [],
+    form16TdsPaise: rupees(240000),
+    form26asTdsPaise: rupees(198000),
+    claimedTdsPaise: rupees(240000),
+    deductors: [
+      {
+        tan: 'DELK08192E',
+        deductorName: 'Apex Cloud Solutions India LLP',
+        form16QuarterlyFiled: false,
+        amountPaise: rupees(42000),
+      },
+    ],
+    aisInterest: [
+      {
+        id: 'kv-int-1',
+        payer: 'Kotak Mahindra Bank',
+        amountPaise: rupees(8900),
+        reportedOn: '2026-04-18',
+      },
+    ],
+    declaredInterestPaise: rupees(8900),
+    npsClaimPercent: 10,
+    form16NpsCapPercent: 10,
+    rebateClaimedPaise: 0,
+    specialRateIncome: [],
+    refundClaimedPaise: rupees(18500),
+    bankAccount: {
+      bankName: 'Kotak Mahindra Bank',
+      accountMasked: '****7109',
+      ifsc: 'KKBK0000422',
+      preValidated: true,
+      evcEnabled: true,
+      nameMatchedWithPan: true,
+    },
+    panAadhaar: {
+      linked: true,
+      operative: true,
+      lastCheckedDate: '2026-06-10',
+    },
+    notice: null,
+  },
+
+  {
+    id: 'bank-preval-stalled',
+    personaLabel: 'Sunita — refund stalled, bank pre-validation pending',
+    situation:
+      'Return submitted and e-verified with ₹58,000 refund claimed. Refund is pending because the bank account is not pre-validated.',
+    assessmentYear: 'AY 2026-27',
+    documents: [
+      {
+        id: 'sr-return',
+        kind: 'return',
+        label: 'ITR-1 acknowledgement',
+        reference: 'ACK 8838810260718',
+        capturedAt: '2026-07-18T16:00:00+05:30',
+        note: 'Submitted return claiming ₹58,000 refund.',
+      },
+      {
+        id: 'sr-form16',
+        kind: 'form-16',
+        label: 'Form 16 Part A',
+        reference: 'TAN HYDS33109M',
+        capturedAt: '2026-06-20T10:15:00+05:30',
+        note: 'Employer tax deduction statement.',
+      },
+      {
+        id: 'sr-26as',
+        kind: 'form-26as',
+        label: 'Form 26AS annual statement',
+        reference: 'PAN ****5529P',
+        capturedAt: '2026-07-15T11:20:00+05:30',
+        note: 'Tax credits matching Form 16.',
+      },
+    ],
+    dueDate: DUE_DATE,
+    filedOn: '2026-07-18T16:00:00+05:30',
+    everifiedOn: '2026-07-18T16:25:00+05:30',
+    challans: [],
+    taxCredits: [],
+    form16TdsPaise: rupees(195000),
+    form26asTdsPaise: rupees(195000),
+    claimedTdsPaise: rupees(195000),
+    deductors: [
+      {
+        tan: 'HYDS33109M',
+        deductorName: 'CyberCity Software Services',
+        form16QuarterlyFiled: true,
+        amountPaise: rupees(195000),
+      },
+    ],
+    aisInterest: [
+      {
+        id: 'sr-int-1',
+        payer: 'State Bank of India',
+        amountPaise: rupees(14200),
+        reportedOn: '2026-04-22',
+      },
+    ],
+    declaredInterestPaise: rupees(14200),
+    npsClaimPercent: 10,
+    form16NpsCapPercent: 10,
+    rebateClaimedPaise: 0,
+    specialRateIncome: [],
+    refundClaimedPaise: rupees(58000),
+    bankAccount: {
+      bankName: 'State Bank of India',
+      accountMasked: '****8842',
+      ifsc: 'SBIN0001402',
+      preValidated: false,
+      evcEnabled: false,
+      nameMatchedWithPan: false,
+    },
+    panAadhaar: {
+      linked: true,
+      operative: true,
+      lastCheckedDate: '2026-05-18',
+    },
+    notice: null,
+  },
+
+  {
+    id: 'pan-inoperative-234h',
+    personaLabel: 'Vikram — inoperative PAN (Sec 234H)',
+    situation:
+      'Aadhaar linkage was not finalized before the statutory cutoff. PAN is marked inoperative, triggering higher deduction rates.',
+    assessmentYear: 'AY 2026-27',
+    documents: [
+      {
+        id: 'vm-26as',
+        kind: 'form-26as',
+        label: 'Form 26AS annual statement',
+        reference: 'PAN ****8812N (Inoperative)',
+        capturedAt: '2026-07-24T18:40:00+05:30',
+        note: 'Shows 20% higher TDS rate applied under Section 206AA due to inoperative status.',
+      },
+      {
+        id: 'vm-return',
+        kind: 'return',
+        label: 'ITR-2 draft return',
+        reference: 'Draft 2026-27',
+        capturedAt: '2026-07-25T11:15:00+05:30',
+        note: 'Return prepared pending PAN reactivation.',
+      },
+    ],
+    dueDate: DUE_DATE,
+    filedOn: '2026-07-25T11:30:00+05:30',
+    everifiedOn: '2026-07-25T11:45:00+05:30',
+    challans: [],
+    taxCredits: [],
+    form16TdsPaise: rupees(310000),
+    form26asTdsPaise: rupees(310000),
+    claimedTdsPaise: rupees(310000),
+    deductors: [
+      {
+        tan: 'DELM77102A',
+        deductorName: 'Starlight Media Works Ltd',
+        form16QuarterlyFiled: true,
+        amountPaise: rupees(310000),
+      },
+    ],
+    aisInterest: [
+      {
+        id: 'vm-int-1',
+        payer: 'Axis Bank',
+        amountPaise: rupees(22000),
+        reportedOn: '2026-04-19',
+      },
+    ],
+    declaredInterestPaise: rupees(22000),
+    npsClaimPercent: 10,
+    form16NpsCapPercent: 10,
+    rebateClaimedPaise: 0,
+    specialRateIncome: [],
+    refundClaimedPaise: rupees(34000),
+    bankAccount: {
+      bankName: 'Axis Bank',
+      accountMasked: '****3091',
+      ifsc: 'UTIB0000214',
+      preValidated: true,
+      evcEnabled: true,
+      nameMatchedWithPan: true,
+    },
+    panAadhaar: {
+      linked: false,
+      operative: false,
+      lastCheckedDate: '2026-07-01',
+    },
     notice: null,
   },
 
@@ -247,6 +536,14 @@ export const profiles: TaxProfile[] = [
     form16TdsPaise: rupees(214300),
     form26asTdsPaise: rupees(209800),
     claimedTdsPaise: rupees(214300),
+    deductors: [
+      {
+        tan: 'PNEK12904D',
+        deductorName: 'Pune Auto Components Ltd',
+        form16QuarterlyFiled: true,
+        amountPaise: rupees(214300),
+      },
+    ],
     aisInterest: [
       {
         id: 'k-int-1',
@@ -261,6 +558,19 @@ export const profiles: TaxProfile[] = [
     rebateClaimedPaise: 0,
     specialRateIncome: [],
     refundClaimedPaise: 0,
+    bankAccount: {
+      bankName: 'State Bank of India',
+      accountMasked: '****9901',
+      ifsc: 'SBIN0000412',
+      preValidated: true,
+      evcEnabled: true,
+      nameMatchedWithPan: true,
+    },
+    panAadhaar: {
+      linked: true,
+      operative: true,
+      lastCheckedDate: '2026-06-20',
+    },
     notice: {
       documentId: 'k-notice',
       code: '139(9)',
@@ -318,6 +628,14 @@ export const profiles: TaxProfile[] = [
     form16TdsPaise: rupees(268900),
     form26asTdsPaise: rupees(268900),
     claimedTdsPaise: rupees(268900),
+    deductors: [
+      {
+        tan: 'BLRE55019J',
+        deductorName: 'Enterprise Cloud Grid Pvt Ltd',
+        form16QuarterlyFiled: true,
+        amountPaise: rupees(268900),
+      },
+    ],
     aisInterest: [
       {
         id: 'r-int-1',
@@ -332,6 +650,20 @@ export const profiles: TaxProfile[] = [
     rebateClaimedPaise: 0,
     specialRateIncome: [],
     refundClaimedPaise: rupees(47500),
+    outstandingDemandPaise: rupees(12000),
+    bankAccount: {
+      bankName: 'ICICI Bank',
+      accountMasked: '****1094',
+      ifsc: 'ICIC0000042',
+      preValidated: true,
+      evcEnabled: true,
+      nameMatchedWithPan: true,
+    },
+    panAadhaar: {
+      linked: true,
+      operative: true,
+      lastCheckedDate: '2026-06-25',
+    },
     notice: null,
   },
 
@@ -391,6 +723,14 @@ export const profiles: TaxProfile[] = [
     form16TdsPaise: rupees(164200),
     form26asTdsPaise: rupees(164200),
     claimedTdsPaise: rupees(164200),
+    deductors: [
+      {
+        tan: 'MUMN33017A',
+        deductorName: 'Apex Media Corp',
+        form16QuarterlyFiled: true,
+        amountPaise: rupees(164200),
+      },
+    ],
     aisInterest: [
       {
         id: 'n-int-1',
@@ -405,6 +745,19 @@ export const profiles: TaxProfile[] = [
     rebateClaimedPaise: 0,
     specialRateIncome: [],
     refundClaimedPaise: rupees(8400),
+    bankAccount: {
+      bankName: 'Bank of Baroda',
+      accountMasked: '****5510',
+      ifsc: 'BARB0MUMB01',
+      preValidated: true,
+      evcEnabled: true,
+      nameMatchedWithPan: true,
+    },
+    panAadhaar: {
+      linked: true,
+      operative: true,
+      lastCheckedDate: '2026-06-01',
+    },
     notice: null,
   },
 ]

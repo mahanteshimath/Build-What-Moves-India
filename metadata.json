@@ -1,0 +1,6 @@
+{
+  "name": "Sakshya - Income Tax Evidence Desk",
+  "description": "Browser-based evidentiary reconciliation desk for Income Tax e-Filing, running deterministic discrepancy checks on synthetic taxpayer records and providing verifiable briefs.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

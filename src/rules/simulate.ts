@@ -8,6 +8,9 @@ export interface Adjustments {
   everified: boolean
   challansCredited: boolean
   filedShiftMinutes: number
+  bankPrevalidated: boolean
+  deductorFiled: boolean
+  panOperative: boolean
 }
 
 export function aisInterestTotal(profile: TaxProfile): number {
@@ -30,6 +33,9 @@ export function baselineAdjustments(profile: TaxProfile): Adjustments {
         ),
       ),
     filedShiftMinutes: 0,
+    bankPrevalidated: profile.bankAccount ? profile.bankAccount.preValidated : true,
+    deductorFiled: profile.deductors ? profile.deductors.every((d) => d.form16QuarterlyFiled) : true,
+    panOperative: profile.panAadhaar ? profile.panAadhaar.operative : true,
   }
 }
 
@@ -59,6 +65,25 @@ export function applyAdjustments(
     claimedTdsPaise: adjustments.claimedTdsPaise,
     declaredInterestPaise: adjustments.declaredInterestPaise,
     refundClaimedPaise: adjustments.refundClaimedPaise,
+    bankAccount: profile.bankAccount
+      ? {
+          ...profile.bankAccount,
+          preValidated: adjustments.bankPrevalidated,
+          nameMatchedWithPan: adjustments.bankPrevalidated,
+          evcEnabled: adjustments.bankPrevalidated,
+        }
+      : undefined,
+    deductors: profile.deductors?.map((d) => ({
+      ...d,
+      form16QuarterlyFiled: adjustments.deductorFiled,
+    })),
+    panAadhaar: profile.panAadhaar
+      ? {
+          ...profile.panAadhaar,
+          operative: adjustments.panOperative,
+          linked: adjustments.panOperative,
+        }
+      : undefined,
     taxCredits: adjustments.challansCredited
       ? profile.challans.map((challan) => ({
           cin: challan.cin,

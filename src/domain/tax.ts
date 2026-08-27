@@ -53,6 +53,28 @@ export interface SpecialRateIncome {
   amountPaise: number
 }
 
+export interface BankAccountInfo {
+  bankName: string
+  accountMasked: string
+  ifsc: string
+  preValidated: boolean
+  evcEnabled: boolean
+  nameMatchedWithPan: boolean
+}
+
+export interface PanAadhaarStatus {
+  linked: boolean
+  operative: boolean
+  lastCheckedDate: string
+}
+
+export interface DeductorRecord {
+  tan: string
+  deductorName: string
+  form16QuarterlyFiled: boolean
+  amountPaise: number
+}
+
 export interface Notice {
   documentId: string
   code: string
@@ -78,6 +100,7 @@ export interface TaxProfile {
   form16TdsPaise: number
   form26asTdsPaise: number
   claimedTdsPaise: number
+  deductors?: DeductorRecord[]
 
   aisInterest: InterestEntry[]
   declaredInterestPaise: number
@@ -89,6 +112,9 @@ export interface TaxProfile {
   specialRateIncome: SpecialRateIncome[]
 
   refundClaimedPaise: number
+  bankAccount?: BankAccountInfo
+  panAadhaar?: PanAadhaarStatus
+  outstandingDemandPaise?: number
   notice: Notice | null
 }
 
