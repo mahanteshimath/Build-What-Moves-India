@@ -1,11 +1,12 @@
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import { ArrowUpRight, Database, FileText, LogOut, ShieldCheck, User } from 'lucide-react'
+import { ArrowUpRight, CircleAlert, Database, FileText, LogOut, ShieldCheck, User } from 'lucide-react'
 import { useAuth } from './auth-context'
 import { officialSources } from './data/sources'
 import { checks } from './rules/checks'
 import BriefPage from './pages/BriefPage'
 import ExplorerPage from './pages/ExplorerPage'
+import IssuesPage from './pages/IssuesPage'
 import LoginPage from './pages/LoginPage'
 import './App.css'
 
@@ -24,6 +25,15 @@ function TopBar() {
     <div className="topbar no-print">
       <div className="topbar__inner">
         <nav className="topbar__nav" aria-label="Application Sections">
+          <NavLink
+            to="/issues"
+            className={({ isActive }) =>
+              `topbar__link ${isActive ? 'topbar__link--active' : ''}`
+            }
+          >
+            <CircleAlert aria-hidden size={16} />
+            <span>Documented Portal Issues</span>
+          </NavLink>
           <NavLink
             to="/brief"
             className={({ isActive }) =>
@@ -152,6 +162,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <ExplorerPage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/issues"
+            element={
+              <RequireAuth>
+                <IssuesPage />
               </RequireAuth>
             }
           />

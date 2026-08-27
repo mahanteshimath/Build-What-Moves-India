@@ -13,6 +13,18 @@ export interface OfficialSource {
   url: string
 }
 
+/** A friction category documented in the local research report, not an official statement. */
+export interface PortalIssue {
+  id: string
+  category: string
+  title: string
+  summary: string
+  observations: string[]
+  /** Names of the checks in src/rules/checks.ts that report this difference. */
+  coveredBy: string[]
+  sources: OfficialSource[]
+}
+
 export interface TaxDocument {
   id: string
   kind: DocumentKind
