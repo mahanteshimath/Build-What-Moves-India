@@ -86,16 +86,15 @@ export default function App() {
       <div className="gov-topbar no-print">
         <div className="gov-topbar__inner">
           <div className="gov-topbar__left">
-            <span className="gov-topbar__flag" aria-hidden="true">🇮🇳</span>
             <span className="gov-topbar__text">
-              भारत सरकार &bull; Government of India
+              Independent hackathon prototype &bull; not a Government of India service
             </span>
           </div>
           <div className="gov-topbar__right">
             <span className="gov-topbar__dept">
-              आयकर विभाग &bull; Income Tax Department
+              Synthetic data &bull; no portal connection
             </span>
-            <span className="gov-topbar__badge">e-Filing Evidentiary Desk</span>
+            <span className="gov-topbar__badge">Prototype</span>
           </div>
         </div>
       </div>
@@ -109,12 +108,12 @@ export default function App() {
               </div>
               <div>
                 <p className="brand">
-                  <span className="brand__hindi">आयकर विभाग</span>
+                  <span className="brand__hindi">साक्ष्य</span>
                   <span className="brand__separator">|</span>
-                  <span className="brand__english">INCOME TAX DEPARTMENT</span>
+                  <span className="brand__english">SAKSHYA</span>
                 </p>
                 <p className="brand__sub">
-                  Sakshya <span className="brand__devanagari">साक्ष्य</span> &bull; Independent e-Filing Evidentiary Verification Desk
+                  An independent evidentiary desk for Income Tax e-Filing &bull; built for a hackathon, unaffiliated with the Income Tax Department
                 </p>
               </div>
             </div>
@@ -135,7 +134,7 @@ export default function App() {
           <div className="privacy-badge">
             <ShieldCheck aria-hidden size={18} />
             <span>
-              <strong>Zero Data Transmission &bull; 100% In-Browser:</strong> Your evidentiary brief is computed locally. Synthetic and captured records never leave your device.
+              <strong>The brief is computed in your browser:</strong> every check and every SHA-256 fingerprint runs locally, and no record is uploaded. The Data Explorer tab is the one exception &mdash; it reads a hosted warehouse of the same synthetic records.
             </span>
           </div>
         </div>

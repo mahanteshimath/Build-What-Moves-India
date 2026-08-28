@@ -39,7 +39,7 @@ Legacy demand revival under section 245 is represented as a ledger gap rather th
 - Findings state objective differences between two named records, never an outcome, eligibility, liability, or portal cause.
 - Research-report figures are labelled research signals.
 - Money stored as integer paise, formatted with `Intl.NumberFormat`.
-- No network calls at runtime.
+- The brief makes no network calls; only the Data Explorer tab reads the hosted synthetic warehouse through `/api/query`.
 
 ## Possible next steps
 

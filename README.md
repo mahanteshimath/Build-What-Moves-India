@@ -1,5 +1,7 @@
 # Sakshya — साक्ष्य
 
+**An independent hackathon prototype. Not a Government of India service, and not affiliated with or endorsed by the Income Tax Department.**
+
 **The taxpayer's side of the evidentiary record, for Income Tax e-Filing.**
 
 When an automated system and your own paperwork disagree, the system issues a demand — not an apology. The burden of proof lands on you. Sakshya assembles your half of that record.
@@ -73,7 +75,9 @@ npm run build
 3. Switch to **Kavita** — a section 139(9) notice naming a document that isn't on record, with the response date.
 4. Switch to **Nandini** — every record agrees, all 11 checks clear.
 5. Scroll to the evidence ledger and show the live SHA-256 fingerprints.
-6. Open devtools, show zero outbound requests, then **Print this brief**.
+6. Open devtools, show the brief making no outbound request, then **Print this brief**.
+
+Demo sign-in: `demo` / `sakshya-demo`. These credentials are fictional and ship inside the bundle; the gate exists to show the walkthrough, not to protect anything.
 
 ## What it is not
 
@@ -82,3 +86,39 @@ No portal login, scraping, OTP handling, government API calls, auto-filing, grie
 Amounts documented from the local research report are labelled research signals, not official facts. Official links are limited to URLs verified reachable, held in [src/data/sources.ts](src/data/sources.ts).
 
 All data is synthetic.
+
+## Disclosure
+
+**Independence.** Sakshya is an independent build for this hackathon. Public documentation and public reporting about the e-Filing portal were read to understand the problem; no portal code was copied, no portal infrastructure was used, and no private system was reverse-engineered.
+
+**No live government system.** There is no portal login, scraping, OTP handling, government API call, auto-filing, or grievance submission. Every record is a simulated integration over synthetic data.
+
+**No real data.** All six taxpayer profiles, PANs, challan identifiers, notices and amounts are fictional. The demo sign-in credentials are fictional. No real identifier, password, OTP or payment detail appears anywhere in the repository.
+
+**No official branding.** No government emblem, seal or departmental logo is used. The header states on every page that this is an independent prototype.
+
+**How Codex contributed.** Codex was the primary development tool for this build:
+
+- Read the deep-research corpus in `Deep Research On ALL Web Sites/` and derived the six recurring failure shapes that became the profiles.
+- Designed the domain contracts in `src/domain/tax.ts` and the eleven pure checks in `src/rules/checks.ts`.
+- Wrote the test suite in `src/rules/checks.test.ts`, including the silence and boundary cases.
+- Built the React surfaces, the SHA-256 evidence ledger, and the print stylesheet.
+- Wrote `snowflake/*.sql` and the allowlist-only `api/query.ts` endpoint.
+- Ran the safety review that produced the constraints in [AGENTS.md](AGENTS.md) — no legal or tax outcomes, no portal-cause claims, findings limited to objective differences between two named records.
+
+**Third-party components**, all under permissive licences:
+
+| Component | Licence | Use |
+| --- | --- | --- |
+| React, React DOM | MIT | UI |
+| React Router | MIT | Routing |
+| Vite, `@vitejs/plugin-react` | MIT | Build |
+| TypeScript | Apache-2.0 | Types |
+| Vitest | MIT | Tests |
+| ESLint, `typescript-eslint` | MIT | Lint |
+| `lucide-react` | ISC | Icons |
+| `snowflake-sdk` | Apache-2.0 | Read-only warehouse queries in `api/query.ts` |
+
+Scaffolded from the standard `npm create vite` React + TypeScript template.
+
+**Network behaviour.** The brief, the checks and the fingerprints are computed entirely in the browser. The optional Data Explorer tab is the only network path: it posts a query *name* from a fixed allowlist to `/api/query`, which runs a read-only statement against a Snowflake warehouse holding the same synthetic records. No SQL crosses the wire and no credential is present in the bundle.

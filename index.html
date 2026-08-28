@@ -3,14 +3,14 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- connect-src is the enforcement behind the "nothing leaves this browser" claim. -->
+    <!-- connect-src 'self' is what keeps records from reaching any third-party origin. -->
     <meta
       http-equiv="Content-Security-Policy"
       content="default-src 'self'; connect-src 'self' ws: wss:; img-src 'self' data:; style-src 'self' 'unsafe-inline'; script-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'self'; form-action 'none'"
     />
-    <meta name="description" content="Sakshya assembles a taxpayer's own side of the evidentiary record for Income Tax e-Filing. Runs entirely in the browser on synthetic records." />
+    <meta name="description" content="Independent hackathon prototype. Sakshya assembles a taxpayer's own side of the evidentiary record for Income Tax e-Filing, from synthetic records, with the brief computed in the browser." />
     <meta name="theme-color" content="#002855" />
-    <title>Sakshya | Income Tax Evidentiary Desk</title>
+    <title>Sakshya | Income Tax Evidentiary Desk (prototype)</title>
   </head>
   <body>
     <div id="root"></div>
