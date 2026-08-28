@@ -94,7 +94,7 @@ export default function App() {
             <span className="gov-topbar__dept">
               Synthetic data &bull; no portal connection
             </span>
-            <span className="gov-topbar__badge">Prototype</span>
+            <span className="gov-topbar__badge">Built with OpenAI Codex</span>
           </div>
         </div>
       </div>
@@ -183,6 +183,9 @@ export default function App() {
         <div className="footer__inner">
           <p className="footer__disclaimer">
             Sakshya is an independent browser-based evidentiary tool. It objectively reconciles discrepancies between named tax documents. It does not provide legal or tax advice, predict tax outcomes, or state portal backend causes.
+          </p>
+          <p className="footer__disclaimer">
+            Built with <strong>OpenAI Codex</strong> &mdash; Codex derived the failure shapes from the research corpus, wrote the {checks.length} deterministic checks and their tests, and built these surfaces. No model runs in the correctness path; every check is a pure function.
           </p>
           <div className="footer__links-section">
             <span className="footer__links-title">Official Income Tax Portals & Sources:</span>
