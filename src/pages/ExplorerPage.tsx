@@ -13,7 +13,10 @@ import {
   Search,
   TableProperties,
   Users,
+  Wand2,
 } from 'lucide-react'
+import { matchQuery } from '../ai/mockNova'
+import { MockAiBadge } from '../components/MockAiBadge'
 
 // The `name` values must stay in step with the allowlist in api/query.ts.
 const RELATIONS = [
@@ -462,6 +465,8 @@ export default function ExplorerPage() {
   const [categoryFilter, setCategoryFilter] = useState<string>('All')
   const [expandedSql, setExpandedSql] = useState<Record<string, boolean>>({})
   const [copiedSql, setCopiedSql] = useState<string | null>(null)
+  const [question, setQuestion] = useState('')
+  const [askResult, setAskResult] = useState<string | null>(null)
 
   const send = useCallback(async (body: Record<string, unknown>, label: string, queryId?: string) => {
     setBusy(true)
@@ -495,6 +500,26 @@ export default function ExplorerPage() {
       setBusy(false)
     }
   }, [])
+
+  /**
+   * Resolves a typed question to one of the cards above. The matcher can only
+   * return a name from the same fixed allowlist the buttons use, so no phrasing
+   * can widen what gets run.
+   */
+  const ask = () => {
+    const match = matchQuery(question)
+    if (!match) {
+      setAskResult('No card matched that. Try words like common, together, rows, or checks.')
+      return
+    }
+    const card = NAMED_QUERIES.find((item) => item.name === match.name)
+    if (!card) {
+      setAskResult('No card matched that.')
+      return
+    }
+    setAskResult(`Running “${card.label}”. ${match.why}`)
+    void send({ name: card.name }, card.label, card.name)
+  }
 
   const filteredRows = useMemo(() => {
     if (!tableSearch.trim()) return rows
@@ -570,6 +595,30 @@ export default function ExplorerPage() {
             <strong>Synthetic validation corpus.</strong> Figures and schema relations demonstrate statistical discrepancy patterns across practice profiles, testing that reconciliation rules scale deterministically on large data warehouses without third-party network calls.
           </span>
         </div>
+
+        <div className="askbox no-print">
+          <input
+            className="askbox__input"
+            type="text"
+            value={question}
+            placeholder="Ask in plain English, e.g. “which mismatch is most common?”"
+            aria-label="Ask in plain English which query to run"
+            onChange={(event) => setQuestion(event.target.value)}
+            onKeyDown={(event) => {
+              if (event.key === 'Enter') ask()
+            }}
+          />
+          <button type="button" className="button button--quiet button--sm" onClick={ask} disabled={busy}>
+            <Wand2 aria-hidden size={14} />
+            <span>Pick a query</span>
+          </button>
+          <MockAiBadge label="Mock-up — keyword match, no model" />
+        </div>
+        {askResult && (
+          <p className={`askbox__result ${askResult.startsWith('No ') ? 'askbox__result--miss' : ''}`}>
+            {askResult}
+          </p>
+        )}
 
         <div className="query-grid">
           {NAMED_QUERIES.map((item) => {

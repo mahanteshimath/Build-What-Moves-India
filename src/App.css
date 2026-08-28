@@ -1453,6 +1453,7 @@ body {
   font-size: 0.9rem;
   font-weight: 600;
   cursor: pointer;
+  text-decoration: none;
   transition: all 140ms ease;
 }
 

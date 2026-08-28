@@ -22,6 +22,7 @@ import {
 import type { Severity } from '../domain/tax'
 import { formatDate, formatDateTime, formatRupees } from '../domain/tax'
 import { FindingCard } from '../components/FindingCard'
+import { AiAssistPanel } from '../components/AiAssistPanel'
 import { ExhibitPanel } from '../components/ExhibitPanel'
 import { ClockStrip } from '../components/ClockStrip'
 import { LedgerDownload } from '../components/LedgerDownload'
@@ -29,6 +30,7 @@ import { kindLabel } from '../components/findingLabels'
 import { useFingerprints } from '../components/useFingerprints'
 import { profiles } from '../data/profiles'
 import { checks, reviewProfile } from '../rules/checks'
+import type { Lang } from '../ai/mockNova'
 import type { Adjustments } from '../rules/simulate'
 import {
   aisInterestTotal,
@@ -132,6 +134,7 @@ export default function BriefPage() {
   const [severityFilter, setSeverityFilter] = useState<'all' | Severity | 'cleared'>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [copiedDocId, setCopiedDocId] = useState<string | null>(null)
+  const [assistLang, setAssistLang] = useState<Lang>('en')
 
   const profile = useMemo(
     () => profiles.find((item) => item.id === selectedId) ?? profiles[0],
@@ -693,6 +696,7 @@ export default function BriefPage() {
                 finding={finding}
                 documentLabels={documentLabels}
                 status={status.get(finding.id)}
+                lang={assistLang}
               />
             ))}
           </ol>
@@ -715,6 +719,13 @@ export default function BriefPage() {
           </div>
         )}
       </section>
+
+      <AiAssistPanel
+        profile={profile}
+        findings={findings}
+        lang={assistLang}
+        onLangChange={setAssistLang}
+      />
 
       {/* Copy-ready text of the same findings, shared with the own-figures page. */}
       <section className="panel no-print" aria-labelledby="exhibit-heading">

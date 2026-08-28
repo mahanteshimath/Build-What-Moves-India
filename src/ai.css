@@ -1,0 +1,218 @@
+/* Mocked AI assist surfaces. Deliberately tinted away from the evidentiary
+   panels so generated prose is never mistaken for a deterministic finding. */
+
+.mockai-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 2px 8px;
+  border: 1px dashed var(--gov-amber);
+  border-radius: 999px;
+  background: var(--gov-amber-soft);
+  color: var(--gov-amber);
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+}
+
+.assist {
+  border: 1px dashed var(--gov-amber);
+  border-radius: var(--radius-lg);
+  background: repeating-linear-gradient(
+    135deg,
+    var(--gov-surface-alt),
+    var(--gov-surface-alt) 12px,
+    #fffdf5 12px,
+    #fffdf5 24px
+  );
+  padding: 16px 18px;
+  margin-top: 12px;
+}
+
+.assist__head {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 6px;
+}
+
+.assist__title {
+  margin: 0;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--gov-navy-primary);
+}
+
+.assist__note {
+  margin: 0 0 12px;
+  font-size: 0.82rem;
+  color: var(--gov-text-muted);
+  max-width: 70ch;
+}
+
+.assist__controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.assist__lang {
+  display: inline-flex;
+  border: 1px solid var(--gov-border);
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  background: var(--gov-surface);
+}
+
+.assist__lang button {
+  border: 0;
+  background: transparent;
+  padding: 6px 12px;
+  font: inherit;
+  font-size: 0.8rem;
+  cursor: pointer;
+  color: var(--gov-text-muted);
+}
+
+.assist__lang button[aria-pressed='true'] {
+  background: var(--gov-navy-primary);
+  color: #fff;
+  font-weight: 600;
+}
+
+.assist__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 8px;
+}
+
+.assist__item {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  background: var(--gov-surface);
+  border: 1px solid var(--gov-border-light);
+  border-left: 3px solid var(--gov-navy-light);
+  border-radius: var(--radius-md);
+  padding: 8px 12px;
+}
+
+.assist__rank {
+  flex: 0 0 auto;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  background: var(--gov-navy-subtle);
+  color: var(--gov-navy-primary);
+  font-size: 0.72rem;
+  font-weight: 700;
+}
+
+.assist__item-title {
+  display: block;
+  font-size: 0.88rem;
+  font-weight: 600;
+  color: var(--gov-text);
+}
+
+.assist__item-line {
+  margin: 2px 0 0;
+  font-size: 0.82rem;
+  color: var(--gov-text-muted);
+}
+
+.assist__draft {
+  width: 100%;
+  min-height: 260px;
+  margin-top: 10px;
+  padding: 12px;
+  border: 1px solid var(--gov-border);
+  border-radius: var(--radius-md);
+  background: var(--gov-surface);
+  font-family: ui-monospace, 'Cascadia Mono', 'Consolas', monospace;
+  font-size: 0.78rem;
+  line-height: 1.55;
+  color: var(--gov-text);
+  resize: vertical;
+}
+
+/* Per-finding plain-language restatement. */
+.explain {
+  margin-top: 10px;
+}
+
+.explain__button {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  border: 1px dashed var(--gov-amber);
+  border-radius: var(--radius-md);
+  background: var(--gov-amber-soft);
+  color: var(--gov-amber);
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 0.76rem;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.explain__button:hover {
+  background: #fde9b8;
+}
+
+.explain__text {
+  margin: 8px 0 0;
+  padding: 10px 12px;
+  border-left: 3px solid var(--gov-amber);
+  background: var(--gov-surface-alt);
+  border-radius: 0 var(--radius-md) var(--radius-md) 0;
+  font-size: 0.85rem;
+  line-height: 1.55;
+  color: var(--gov-text);
+}
+
+.explain__foot {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.7rem;
+  color: var(--gov-text-light);
+}
+
+/* Plain-English query box on the Data Explorer. */
+.askbox {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  align-items: center;
+  margin-top: 12px;
+}
+
+.askbox__input {
+  flex: 1 1 280px;
+  padding: 8px 12px;
+  border: 1px solid var(--gov-border);
+  border-radius: var(--radius-md);
+  font: inherit;
+  font-size: 0.85rem;
+  background: var(--gov-surface);
+  color: var(--gov-text);
+}
+
+.askbox__result {
+  margin: 10px 0 0;
+  font-size: 0.82rem;
+  color: var(--gov-text-muted);
+}
+
+.askbox__result--miss {
+  color: var(--gov-amber);
+}

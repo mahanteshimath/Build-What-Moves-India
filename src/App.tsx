@@ -1,6 +1,6 @@
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import { ArrowUpRight, Award, CircleAlert, Database, FileText, LogOut, PencilLine, ShieldCheck, User } from 'lucide-react'
+import { ArrowUpRight, Award, CircleAlert, Compass, Database, FileText, LogOut, PencilLine, ShieldCheck, User } from 'lucide-react'
 import { useAuth } from './auth-context'
 import { officialSources } from './data/sources'
 import { checks } from './rules/checks'
@@ -10,9 +10,11 @@ import IssuesPage from './pages/IssuesPage'
 import LoginPage from './pages/LoginPage'
 import MyCasePage from './pages/MyCasePage'
 import ReadinessPage from './pages/ReadinessPage'
+import TourPage from './pages/TourPage'
 import './App.css'
 import './evidence.css'
 import './exhibit.css'
+import './ai.css'
 import './a11y.css'
 
 function RequireAuth({ children }: { children: ReactNode }) {
@@ -30,6 +32,15 @@ function TopBar() {
     <div className="topbar no-print">
       <div className="topbar__inner">
         <nav className="topbar__nav" aria-label="Application Sections">
+          <NavLink
+            to="/tour"
+            className={({ isActive }) =>
+              `topbar__link ${isActive ? 'topbar__link--active' : ''}`
+            }
+          >
+            <Compass aria-hidden size={16} />
+            <span>Start Here</span>
+          </NavLink>
           <NavLink
             to="/issues"
             className={({ isActive }) =>
@@ -167,6 +178,7 @@ export default function App() {
 
       <main className="layout" id="main">
         <Routes>
+          <Route path="/tour" element={<TourPage />} />
           <Route
             path="/login"
             element={user ? <Navigate to="/brief" replace /> : <LoginPage />}
@@ -211,10 +223,7 @@ export default function App() {
               </RequireAuth>
             }
           />
-          <Route
-            path="*"
-            element={<Navigate to={user ? '/brief' : '/login'} replace />}
-          />
+          <Route path="*" element={<Navigate to="/tour" replace />} />
         </Routes>
       </main>
 

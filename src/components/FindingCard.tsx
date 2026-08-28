@@ -1,6 +1,9 @@
-import { ArrowUpRight, CheckCircle2, CircleAlert, FileSearch, ShieldCheck, Sparkles, Wrench } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowUpRight, CheckCircle2, CircleAlert, FileSearch, FlaskConical, ShieldCheck, Sparkles, Wrench } from 'lucide-react'
 import type { Finding, Severity } from '../domain/tax'
 import type { FindingStatus } from '../rules/simulate'
+import type { Lang } from '../ai/mockNova'
+import { MOCK_NOTICE, explainFinding } from '../ai/mockNova'
 import { authenticateNotice } from '../data/sources'
 import { severityLabel, statusLabel } from './findingLabels'
 
@@ -14,11 +17,14 @@ export function FindingCard({
   finding,
   documentLabels,
   status,
+  lang = 'en',
 }: {
   finding: Finding
   documentLabels: Map<string, string>
   status?: FindingStatus
+  lang?: Lang
 }) {
+  const [explained, setExplained] = useState(false)
   return (
     <li className={`finding finding--${finding.severity} ${status ? `finding--status-${status}` : ''}`}>
       <div className="finding__top">
@@ -87,6 +93,30 @@ export function FindingCard({
           )}
         </div>
       )}
+
+      <div className="explain no-print">
+        <button
+          type="button"
+          className="explain__button"
+          aria-expanded={explained}
+          onClick={() => setExplained((open) => !open)}
+        >
+          <FlaskConical aria-hidden size={13} />
+          <span>
+            {explained
+              ? 'Hide the plain-language version'
+              : lang === 'hi'
+                ? 'सरल भाषा में समझाएँ (नमूना)'
+                : 'Explain this plainly (mock-up)'}
+          </span>
+        </button>
+        {explained && (
+          <>
+            <p className="explain__text">{explainFinding(finding, lang)}</p>
+            <small className="explain__foot">{MOCK_NOTICE[lang]}</small>
+          </>
+        )}
+      </div>
 
       <div className="finding__footer">
         <a
