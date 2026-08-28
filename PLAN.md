@@ -12,7 +12,7 @@ Not a filing utility. Filing utilities are the diverging frontends whose logic d
 - [x] Domain contracts in `src/domain/tax.ts` — profile, document, challan, notice, finding, comparison, paise and date formatters
 - [x] Nine synthetic profiles in `src/data/profiles.ts`, one per issue category
 - [x] Verified official URLs isolated in `src/data/sources.ts`
-- [x] Fifteen pure checks in `src/rules/checks.ts`
+- [x] Seventeen pure checks in `src/rules/checks.ts`
 - [x] Forty-eight tests across `src/rules/` and `src/data/`, including silence cases and boundary cases
 - [x] Hand-entered figures at `/my-case`, running the same checks, with nothing uploaded or stored
 - [x] A remedy on every finding: the route, who has to act, and the portal service it goes through

@@ -26,7 +26,7 @@ export const portalIssues: PortalIssue[] = [
       'Research notes record a fee under section 234F of ₹5,000 on a belated return, or ₹1,000 where total income is below ₹5 lakh.',
       'Research notes record manual CIN and BSR entry producing validation mismatches and repeated refresh attempts.',
     ],
-    coveredBy: ['challanCredit', 'deadlineGap'],
+    coveredBy: ['challanCredit', 'deadlineGap', 'creditPaidAfterFiling'],
     sources: [tdsMismatchHelp, portalHome],
   },
   {
@@ -57,7 +57,7 @@ export const portalIssues: PortalIssue[] = [
       'Research notes record three failed attempts producing a 30-minute lockout.',
       'Research notes record ad-blockers and browser security settings suppressing the OTP dialog with no error message shown.',
     ],
-    coveredBy: ['everification', 'panAadhaarOperative'],
+    coveredBy: ['everification', 'panAadhaarOperative', 'verificationBeforeFiling'],
     sources: [everifyFaq, staticPasswordHelp, linkAadhaarHelp],
   },
   {

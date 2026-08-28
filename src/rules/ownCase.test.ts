@@ -28,6 +28,85 @@ describe('rupeesToPaise', () => {
     expect(rupeesToPaise('   ')).toBe(0)
     expect(rupeesToPaise('abc')).toBe(0)
   })
+
+  it('drops a stray minus sign, since no field here carries a negative', () => {
+    expect(rupeesToPaise('-5000')).toBe(500000)
+    expect(rupeesToPaise('\u20b9 -1,234.56')).toBe(123456)
+  })
+})
+
+describe('impossible date orders', () => {
+  it('reports a verification date earlier than the submission date', () => {
+    const ids = reviewProfile(
+      buildOwnProfile({
+        ...emptyOwnCase(),
+        filedOn: '2026-08-01T10:00',
+        everifiedOn: '2026-07-01T10:00',
+      }),
+    ).map((finding) => finding.id)
+
+    expect(ids).toContain('verification-before-filing')
+  })
+
+  it('stays silent when verification follows submission', () => {
+    const ids = reviewProfile(
+      buildOwnProfile({
+        ...emptyOwnCase(),
+        filedOn: '2026-07-01T10:00',
+        everifiedOn: '2026-07-01T10:05',
+      }),
+    ).map((finding) => finding.id)
+
+    expect(ids).not.toContain('verification-before-filing')
+  })
+
+  it('reports a claimed challan the receipt dates after submission', () => {
+    const ids = reviewProfile(
+      buildOwnProfile({
+        ...emptyOwnCase(),
+        challanCin: 'CIN-LATE',
+        challanAmount: '5000',
+        challanPaidAt: '2026-09-15T10:00',
+        challanListedInReturn: true,
+        filedOn: '2026-07-10T10:00',
+        everifiedOn: '2026-07-10T11:00',
+      }),
+    ).map((finding) => finding.id)
+
+    expect(ids).toContain('credit-after-filing-CIN-LATE')
+  })
+
+  it('stays silent where the payment precedes submission', () => {
+    const ids = reviewProfile(
+      buildOwnProfile({
+        ...emptyOwnCase(),
+        challanCin: 'CIN-OK',
+        challanAmount: '5000',
+        challanPaidAt: '2026-07-01T10:00',
+        challanListedInReturn: true,
+        filedOn: '2026-07-10T10:00',
+        everifiedOn: '2026-07-10T11:00',
+      }),
+    ).map((finding) => finding.id)
+
+    expect(ids).toEqual(['all-clear'])
+  })
+
+  it('does not report an unclaimed challan paid later, since nothing claims it', () => {
+    const ids = reviewProfile(
+      buildOwnProfile({
+        ...emptyOwnCase(),
+        challanCin: 'CIN-UNCLAIMED',
+        challanAmount: '5000',
+        challanPaidAt: '2026-09-15T10:00',
+        challanListedInReturn: false,
+        filedOn: '2026-07-10T10:00',
+        everifiedOn: '2026-07-10T11:00',
+      }),
+    ).map((finding) => finding.id)
+
+    expect(ids).not.toContain('credit-after-filing-CIN-UNCLAIMED')
+  })
 })
 
 describe('IST instants', () => {

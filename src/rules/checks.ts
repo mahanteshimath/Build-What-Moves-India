@@ -616,6 +616,67 @@ const demandOffsetLedger: Check = (profile) => {
   ]
 }
 
+/** A return cannot be verified before it was submitted. */
+const verificationBeforeFiling: Check = (profile) => {
+  if (!profile.filedOn || !profile.everifiedOn) return []
+  if (new Date(profile.everifiedOn).getTime() >= new Date(profile.filedOn).getTime()) return []
+
+  return [
+    {
+      id: 'verification-before-filing',
+      severity: 'action-needed',
+      title: 'The verification date recorded is earlier than the submission date',
+      detail: `The return records submission at ${formatDateTime(profile.filedOn)} and verification at ${formatDateTime(profile.everifiedOn)}. Verification cannot precede submission, so one of these two dates is transcribed wrongly.`,
+      documentIds: profile.documents
+        .filter((document) => document.kind === 'return')
+        .map((document) => document.id),
+      source: everifyFaq,
+      comparison: {
+        label: 'Recorded order of events',
+        left: { source: 'Submitted on', value: formatDateTime(profile.filedOn) },
+        right: { source: 'Verified on', value: formatDateTime(profile.everifiedOn) },
+      },
+      remedy: {
+        route: 'Re-read both dates from the acknowledgement',
+        actor: 'You',
+        detail:
+          'Check the submission and verification dates against the acknowledgement itself before this brief is used anywhere. A brief carrying an impossible date order will not be read past.',
+        service: everifyService,
+      },
+    },
+  ]
+}
+
+/** A return cannot claim credit for a payment made after it was submitted. */
+const creditPaidAfterFiling: Check = (profile) => {
+  if (!profile.filedOn) return []
+  const filedAt = new Date(profile.filedOn).getTime()
+
+  return profile.challans
+    .filter((challan) => profile.taxCredits.some((credit) => credit.cin === challan.cin))
+    .filter((challan) => new Date(challan.paidAt).getTime() > filedAt)
+    .map((challan) => ({
+      id: `credit-after-filing-${challan.cin}`,
+      severity: 'action-needed',
+      title: 'The return claims a payment that the receipt dates after submission',
+      detail: `The taxes-paid schedule lists CIN ${challan.cin}, but the challan receipt records payment at ${formatDateTime(challan.paidAt)}, after the return was submitted at ${formatDateTime(profile.filedOn ?? '')}. One of these two dates is transcribed wrongly.`,
+      documentIds: [challan.documentId],
+      source: portalHome,
+      comparison: {
+        label: 'Recorded order of events',
+        left: { source: 'Return submitted', value: formatDateTime(profile.filedOn ?? '') },
+        right: { source: 'Challan paid', value: formatDateTime(challan.paidAt) },
+      },
+      remedy: {
+        route: 'Check the payment date against the challan status',
+        actor: 'You',
+        detail:
+          'The payment date on the portal is the record that governs. Correct whichever date was transcribed wrongly before this brief is used anywhere.',
+        service: knowPaymentStatus,
+      },
+    } satisfies Finding))
+}
+
 export const checks: Check[] = [
   challanCredit,
   deadlineGap,
@@ -632,6 +693,8 @@ export const checks: Check[] = [
   demandOffsetLedger,
   refundBand,
   noticeEvidence,
+  verificationBeforeFiling,
+  creditPaidAfterFiling,
 ]
 
 export function reviewProfile(profile: TaxProfile): Finding[] {

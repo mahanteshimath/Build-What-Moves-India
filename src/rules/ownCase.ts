@@ -105,11 +105,12 @@ export function istEndOfDay(date: string): string {
 
 /** Accepts what a person copies off a statement: "₹1,23,456.78", "12345", "". */
 export function rupeesToPaise(text: string): number {
-  const cleaned = text.replace(/[^0-9.-]/g, '')
+  const cleaned = text.replace(/[^0-9.]/g, '')
   if (!cleaned) return 0
   const value = Number(cleaned)
   if (!Number.isFinite(value)) return 0
-  return Math.round(value * 100)
+  // No field on these forms carries a negative amount, so a stray sign is dropped.
+  return Math.round(Math.abs(value) * 100)
 }
 
 export function percentValue(text: string): number {

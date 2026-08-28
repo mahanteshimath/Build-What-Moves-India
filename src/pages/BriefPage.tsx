@@ -625,6 +625,7 @@ export default function BriefPage() {
               <input
                 type="text"
                 placeholder="Search findings (e.g. Challan, TDS, NPS, Bank, PAN)..."
+                aria-label="Search findings"
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="search-box__input"

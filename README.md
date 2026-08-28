@@ -25,15 +25,15 @@ In each case the citizen holds the contradicting record and has no way to **asse
 
 ## What it does
 
-**Reconcile** — 15 deterministic checks run over a taxpayer profile, each reporting an objective difference between two named records, with both values shown side by side.
+**Reconcile** — 17 deterministic checks run over a taxpayer profile, each reporting an objective difference between two named records, with both values shown side by side.
 
-**Use your own figures** — the same 15 checks run against numbers you type in yourself, at `/my-case`. Nothing is uploaded, nothing is stored, and refreshing the page clears it.
+**Use your own figures** — the same 17 checks run against numbers you type in yourself, at `/my-case`. Nothing is uploaded, nothing is stored, and refreshing the page clears it.
 
 **Act** — every finding names the correction route, who has to act on it (you, your deductor, or the Department), and links the portal service that route goes through.
 
 **Track the clock** — the dates already on the documents (filing due date, the 30-day e-verification window, a notice response date) are shown with the plain time remaining.
 
-**Score your own readiness** — KarSamman (कर सम्मान) scores out of 1000 how much of your own evidence is assembled, across ten levels. Timeliness and accuracy are read from the same 15 checks, so the score can never disagree with the brief. It is **not** a rating conferred by any authority: nobody else issues, sees or acts on it, and it unlocks no benefit. Instead of rewards it lists the documented consequences that assembled evidence answers — a section 234F late fee, a section 139(9) defective return notice, a lapsed verification window — each linked to the guidance describing it.
+**Score your own readiness** — KarSamman (कर सम्मान) scores out of 1000 how much of your own evidence is assembled, across ten levels. Timeliness and accuracy are read from the same 17 checks, so the score can never disagree with the brief. It is **not** a rating conferred by any authority: nobody else issues, sees or acts on it, and it unlocks no benefit. Instead of rewards it lists the documented consequences that assembled evidence answers — a section 234F late fee, a section 139(9) defective return notice, a lapsed verification window — each linked to the guidance describing it.
 
 **Prove** — every record is fingerprinted with SHA-256 in the browser via `crypto.subtle`, and the ledger downloads as text carrying the exact string each digest was taken over, so a third party can recompute it.
 
@@ -58,6 +58,8 @@ In each case the citizen holds the contradicting record and has no way to **asse
 | `demandOffsetLedger` | A demand offset with no assessment order on record |
 | `refundBand` | A refund above the documented review band |
 | `noticeEvidence` | Documents a notice names that are not on record |
+| `verificationBeforeFiling` | A verification date earlier than the submission date |
+| `creditPaidAfterFiling` | A claimed challan the receipt dates after submission |
 
 Every check is a pure function tested in [src/rules/checks.test.ts](src/rules/checks.test.ts). No model sits in the correctness path.
 
@@ -89,7 +91,7 @@ npm run build
 1. Open with **Priya** — tax paid 31 July 21:40, return submitted 01 Aug 00:12.
 2. Read the timeline finding: both timestamps, the gap, the CIN, and the challan absent from the schedule.
 3. Switch to **Kavita** — a section 139(9) notice naming a document that isn't on record, with the response date.
-4. Switch to **Nandini** — every record agrees, all 15 checks clear.
+4. Switch to **Nandini** — every record agrees, all 17 checks clear.
 5. Scroll to the evidence ledger and show the live SHA-256 fingerprints.
 6. Open devtools, show the brief making no outbound request, then **Print this brief**.
 7. Open **Your Own Figures** and type Priya’s numbers in by hand — the same three findings come back. Refresh, and they are gone.
@@ -117,7 +119,7 @@ All data is synthetic.
 **How Codex contributed.** Codex was the primary development tool for this build:
 
 - Read the deep-research corpus in `Deep Research On ALL Web Sites/` and derived the recurring failure shapes that became the profiles.
-- Designed the domain contracts in `src/domain/tax.ts` and the fifteen pure checks in `src/rules/checks.ts`.
+- Designed the domain contracts in `src/domain/tax.ts` and the seventeen pure checks in `src/rules/checks.ts`.
 - Wrote the test suite in `src/rules/checks.test.ts`, including the silence and boundary cases.
 - Built the React surfaces, the SHA-256 evidence ledger, and the print stylesheet.
 - Wrote `snowflake/*.sql` and the allowlist-only `api/query.ts` endpoint.
