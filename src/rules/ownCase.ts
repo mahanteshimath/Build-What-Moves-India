@@ -394,6 +394,14 @@ export function buildOwnProfile(input: OwnCaseInput): TaxProfile {
     },
     outstandingDemandPaise: rupeesToPaise(input.outstandingDemand),
     notice,
+    // Nothing here is asked for on the form, so it stays recorded as unknown.
+    civic: {
+      consecutiveOnTimeYears: 0,
+      advanceTaxInstalmentsPaid: 0,
+      tdsCoveredFullLiability: false,
+      literacyQuizCompleted: false,
+      budgetConsultationSubmitted: false,
+    },
   }
 }
 

@@ -1,6 +1,7 @@
 import { DownloadCloud } from 'lucide-react'
 import type { TaxProfile } from '../domain/tax'
 import { ledgerText } from '../rules/ledger'
+import { saveBlob } from '../rules/saveBlob'
 
 /** Saves the ledger as text so a third party can re-hash and check it. */
 export function LedgerDownload({
@@ -12,12 +13,7 @@ export function LedgerDownload({
 }) {
   const download = () => {
     const text = ledgerText(profile, fingerprints, new Date().toISOString())
-    const url = URL.createObjectURL(new Blob([text], { type: 'text/plain' }))
-    const link = document.createElement('a')
-    link.href = url
-    link.download = `sakshya-ledger-${profile.id}.txt`
-    link.click()
-    URL.revokeObjectURL(url)
+    saveBlob(new Blob([text], { type: 'text/plain' }), `sakshya-ledger-${profile.id}.txt`)
   }
 
   if (profile.documents.length === 0) return null

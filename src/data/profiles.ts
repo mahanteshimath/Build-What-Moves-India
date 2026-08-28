@@ -761,8 +761,14 @@ export const profiles: TaxProfile[] = [
       operative: true,
       lastCheckedDate: '2026-06-01',
     },
-    notice: null,
-  },
+    notice: null,    civic: {
+      consecutiveOnTimeYears: 5,
+      advanceTaxInstalmentsPaid: 4,
+      tdsCoveredFullLiability: true,
+      literacyQuizCompleted: true,
+      budgetConsultationSubmitted: true,
+      portalOpenedOn: '2026-06-20T00:00:00+05:30',
+    },  },
 ]
 
 export function profileById(id: string): TaxProfile {

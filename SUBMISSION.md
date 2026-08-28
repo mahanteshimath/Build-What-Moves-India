@@ -70,6 +70,7 @@ Scaffolded from the standard `npm create vite` React + TypeScript template. Host
 | 0:00–0:10 | Priya paid 31 July 21:40. Return submitted 1 Aug 00:12. The portal says she filed late. |
 | 0:10–0:50 | Sign in as `demo`. Read one finding showing both values and the CIN, and the route that corrects it. Switch to Kavita (139(9) notice naming a document not on record). Switch to Nandini (all fifteen clear — the tool doesn't manufacture problems). |
 | 0:50–1:00 | Open **Your Own Figures**, type the same numbers in by hand, and get the same findings plus a copy-ready grievance note. Refresh: everything is gone. |
+| 1:00–1:10 | **KarSamman readiness** — 1000/1000 for the reconciled record, 350 for the belated one. The score is read from the same checks, so it can never flatter a record the brief contradicts. Nobody else can see it. |
 | 1:00–1:20 | Why this shape: every finding names two records and shows both numbers. Never predicts an outcome. Enforced by the tests. |
 | 1:20–1:45 | How Codex built it — research corpus → failure shapes → fifteen checks → 93 tests → the safety review. |
 | 1:45–2:00 | Independent prototype, synthetic data, no government connection, no model in the correctness path. |

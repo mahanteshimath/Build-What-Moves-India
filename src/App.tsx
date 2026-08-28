@@ -1,6 +1,6 @@
 import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
-import { ArrowUpRight, CircleAlert, Database, FileText, LogOut, PencilLine, ShieldCheck, User } from 'lucide-react'
+import { ArrowUpRight, Award, CircleAlert, Database, FileText, LogOut, PencilLine, ShieldCheck, User } from 'lucide-react'
 import { useAuth } from './auth-context'
 import { officialSources } from './data/sources'
 import { checks } from './rules/checks'
@@ -9,6 +9,7 @@ import ExplorerPage from './pages/ExplorerPage'
 import IssuesPage from './pages/IssuesPage'
 import LoginPage from './pages/LoginPage'
 import MyCasePage from './pages/MyCasePage'
+import ReadinessPage from './pages/ReadinessPage'
 import './App.css'
 import './evidence.css'
 import './exhibit.css'
@@ -55,6 +56,15 @@ function TopBar() {
           >
             <PencilLine aria-hidden size={16} />
             <span>Your Own Figures</span>
+          </NavLink>
+          <NavLink
+            to="/readiness"
+            className={({ isActive }) =>
+              `topbar__link ${isActive ? 'topbar__link--active' : ''}`
+            }
+          >
+            <Award aria-hidden size={16} />
+            <span>KarSamman Readiness</span>
           </NavLink>
           <NavLink
             to="/explorer"
@@ -182,6 +192,14 @@ export default function App() {
             element={
               <RequireAuth>
                 <MyCasePage />
+              </RequireAuth>
+            }
+          />
+          <Route
+            path="/readiness"
+            element={
+              <RequireAuth>
+                <ReadinessPage />
               </RequireAuth>
             }
           />

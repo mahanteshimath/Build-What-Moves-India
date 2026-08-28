@@ -96,6 +96,21 @@ export interface Notice {
   requiredDocumentIds: string[]
 }
 
+/**
+ * Facts about the taxpayer's own civic record that no check can derive from a
+ * single year's documents. Supplied by the person, never conferred on them.
+ */
+export interface CivicRecord {
+  consecutiveOnTimeYears: number
+  /** Of four quarterly instalments, or 4 where TDS covered the liability. */
+  advanceTaxInstalmentsPaid: number
+  tdsCoveredFullLiability: boolean
+  literacyQuizCompleted: boolean
+  budgetConsultationSubmitted: boolean
+  /** When filing opened for the year, for the early-filing bonus. */
+  portalOpenedOn?: string
+}
+
 export interface TaxProfile {
   id: string
   personaLabel: string
@@ -129,6 +144,7 @@ export interface TaxProfile {
   panAadhaar?: PanAadhaarStatus
   outstandingDemandPaise?: number
   notice: Notice | null
+  civic?: CivicRecord
 }
 
 export interface Comparison {

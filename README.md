@@ -33,6 +33,8 @@ In each case the citizen holds the contradicting record and has no way to **asse
 
 **Track the clock** — the dates already on the documents (filing due date, the 30-day e-verification window, a notice response date) are shown with the plain time remaining.
 
+**Score your own readiness** — KarSamman (कर सम्मान) scores out of 1000 how much of your own evidence is assembled, across ten levels. Timeliness and accuracy are read from the same 15 checks, so the score can never disagree with the brief. It is **not** a rating conferred by any authority: nobody else issues, sees or acts on it, and it unlocks no benefit. Instead of rewards it lists the documented consequences that assembled evidence answers — a section 234F late fee, a section 139(9) defective return notice, a lapsed verification window — each linked to the guidance describing it.
+
 **Prove** — every record is fingerprinted with SHA-256 in the browser via `crypto.subtle`, and the ledger downloads as text carrying the exact string each digest was taken over, so a third party can recompute it.
 
 **Contest** — the whole brief prints to one page, carrying the comparisons, the records used, and the official links.
