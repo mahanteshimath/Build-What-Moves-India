@@ -10,10 +10,10 @@ Not a filing utility. Filing utilities are the diverging frontends whose logic d
 
 - [x] Extract and analyse the Income Tax portal research
 - [x] Domain contracts in `src/domain/tax.ts` — profile, document, challan, notice, finding, comparison, paise and date formatters
-- [x] Six synthetic profiles in `src/data/profiles.ts`, one per issue category
+- [x] Nine synthetic profiles in `src/data/profiles.ts`, one per issue category
 - [x] Verified official URLs isolated in `src/data/sources.ts`
-- [x] Eleven pure checks in `src/rules/checks.ts`
-- [x] Twenty-four tests in `src/rules/checks.test.ts`, including silence cases and boundary cases
+- [x] Fifteen pure checks in `src/rules/checks.ts`
+- [x] Forty-eight tests across `src/rules/` and `src/data/`, including silence cases and boundary cases
 - [x] Three surfaces in `src/App.tsx` — situation picker, findings with two-value comparisons, evidence ledger
 - [x] In-browser SHA-256 fingerprinting via `crypto.subtle`
 - [x] Print brief via `window.print()` with print-only stylesheet
