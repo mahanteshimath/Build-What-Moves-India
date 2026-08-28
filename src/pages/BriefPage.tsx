@@ -1,34 +1,35 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import {
   ArrowUpRight,
   Building2,
   Check,
   CheckCircle2,
-  CircleAlert,
   Clock,
   Copy,
   DownloadCloud,
   FileCheck,
-  FileSearch,
-  FileText,
   Filter,
-  HelpCircle,
   KeyRound,
   Landmark,
   Link2,
   Printer,
   RotateCcw,
   Search,
-  SendHorizontal,
   ShieldCheck,
   SlidersHorizontal,
   Sparkles,
 } from 'lucide-react'
-import type { DocumentKind, Finding, Severity, TaxDocument } from '../domain/tax'
-import { fingerprintSource, formatDate, formatDateTime, formatRupees } from '../domain/tax'
+import type { Severity } from '../domain/tax'
+import { formatDate, formatDateTime, formatRupees } from '../domain/tax'
+import { FindingCard } from '../components/FindingCard'
+import { ExhibitPanel } from '../components/ExhibitPanel'
+import { ClockStrip } from '../components/ClockStrip'
+import { LedgerDownload } from '../components/LedgerDownload'
+import { kindLabel } from '../components/findingLabels'
+import { useFingerprints } from '../components/useFingerprints'
 import { profiles } from '../data/profiles'
 import { checks, reviewProfile } from '../rules/checks'
-import type { Adjustments, FindingStatus } from '../rules/simulate'
+import type { Adjustments } from '../rules/simulate'
 import {
   aisInterestTotal,
   applyAdjustments,
@@ -42,61 +43,9 @@ import {
   staticPasswordHelp,
 } from '../data/sources'
 
-const severityLabel: Record<Severity, string> = {
-  'action-needed': 'Action needed',
-  review: 'Review',
-  ready: 'Ready',
-}
-
 /** Slider granularity, in paise. */
 const STEP_PAISE = 100_00
 const FILING_SHIFT_LIMIT_MINUTES = 2880
-
-const kindLabel: Record<DocumentKind, string> = {
-  'form-16': 'Form 16',
-  'form-26as': 'Form 26AS',
-  ais: 'AIS',
-  challan: 'Challan',
-  return: 'Return',
-  notice: 'Notice',
-}
-
-function SeverityIcon({ severity }: { severity: Severity }) {
-  if (severity === 'action-needed') return <CircleAlert aria-hidden size={18} />
-  if (severity === 'review') return <FileSearch aria-hidden size={18} />
-  return <CheckCircle2 aria-hidden size={18} />
-}
-
-/** Hashes each record in the browser so the ledger shows a real fingerprint. */
-function useFingerprints(documents: TaxDocument[]): Record<string, string> {
-  const [prints, setPrints] = useState<Record<string, string>>({})
-
-  useEffect(() => {
-    let cancelled = false
-    const encoder = new TextEncoder()
-
-    Promise.all(
-      documents.map(async (document) => {
-        const digest = await crypto.subtle.digest(
-          'SHA-256',
-          encoder.encode(fingerprintSource(document)),
-        )
-        const hex = [...new Uint8Array(digest)]
-          .map((byte) => byte.toString(16).padStart(2, '0'))
-          .join('')
-        return [document.id, hex.slice(0, 16)] as const
-      }),
-    ).then((entries) => {
-      if (!cancelled) setPrints(Object.fromEntries(entries))
-    })
-
-    return () => {
-      cancelled = true
-    }
-  }, [documents])
-
-  return prints
-}
 
 function MoneyLever({
   id,
@@ -175,91 +124,6 @@ function ToggleLever({
   )
 }
 
-const statusLabel: Record<FindingStatus, string> = {
-  carried: 'Unchanged by your edit',
-  cleared: 'Cleared by your edit',
-  raised: 'Raised by your edit',
-}
-
-function FindingCard({
-  finding,
-  documentLabels,
-  status,
-}: {
-  finding: Finding
-  documentLabels: Map<string, string>
-  status?: FindingStatus
-}) {
-  return (
-    <li className={`finding finding--${finding.severity} ${status ? `finding--status-${status}` : ''}`}>
-      <div className="finding__top">
-        <div className="finding__chip">
-          <SeverityIcon severity={finding.severity} />
-          <span>{severityLabel[finding.severity]}</span>
-        </div>
-        {status === 'raised' && (
-          <span className="finding__status finding__status--raised">
-            <Sparkles aria-hidden size={13} />
-            {statusLabel.raised}
-          </span>
-        )}
-      </div>
-
-      <h3 className="finding__title">{finding.title}</h3>
-      <p className="finding__detail">{finding.detail}</p>
-
-      {finding.comparison && (
-        <div className="compare">
-          <p className="compare__label">{finding.comparison.label}</p>
-          <div className="compare__pair">
-            <div className="compare__cell">
-              <span className="compare__source">
-                {finding.comparison.left.source}
-              </span>
-              <strong className="compare__value">
-                {finding.comparison.left.value}
-              </strong>
-            </div>
-            <div className="compare__cell">
-              <span className="compare__source">
-                {finding.comparison.right.source}
-              </span>
-              <strong className="compare__value">
-                {finding.comparison.right.value}
-              </strong>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {finding.documentIds.length > 0 && (
-        <div className="finding__docs-wrap">
-          <span className="finding__docs-label">Records on file:</span>
-          <div className="finding__doc-chips">
-            {finding.documentIds.map((id) => (
-              <span key={id} className="finding__doc-chip">
-                {documentLabels.get(id) ?? id}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      <div className="finding__footer">
-        <a
-          className="finding__source"
-          href={finding.source.url}
-          target="_blank"
-          rel="noreferrer"
-        >
-          <span>{finding.source.label}</span>
-          <ArrowUpRight aria-hidden size={14} />
-        </a>
-      </div>
-    </li>
-  )
-}
-
 export default function BriefPage() {
   const [selectedId, setSelectedId] = useState(profiles[0].id)
   const [adjustments, setAdjustments] = useState<Adjustments>(() =>
@@ -268,8 +132,6 @@ export default function BriefPage() {
   const [severityFilter, setSeverityFilter] = useState<'all' | Severity | 'cleared'>('all')
   const [searchQuery, setSearchQuery] = useState('')
   const [copiedDocId, setCopiedDocId] = useState<string | null>(null)
-  const [exhibitTab, setExhibitTab] = useState<'enivaran' | 'ais' | 'traces'>('enivaran')
-  const [copiedExhibit, setCopiedExhibit] = useState(false)
 
   const profile = useMemo(
     () => profiles.find((item) => item.id === selectedId) ?? profiles[0],
@@ -340,105 +202,7 @@ export default function BriefPage() {
   const update = (patch: Partial<Adjustments>) =>
     setAdjustments((current) => ({ ...current, ...patch }))
 
-  // Generate copy-ready text for e-Nivaran grievance / AIS Feedback / TRACES correction
-  const exhibitText = useMemo(() => {
-    const timeNow = new Date().toISOString()
-    const docList = profile.documents
-      .map(
-        (d) =>
-          `* ${d.label} [Ref: ${d.reference}] (Captured: ${d.capturedAt}, SHA256: ${fingerprints[d.id] ?? 'sha256:verified'})`,
-      )
-      .join('\n')
 
-    if (exhibitTab === 'enivaran') {
-      const issues = findings
-        .filter((f) => f.severity === 'action-needed' || f.severity === 'review')
-        .map((f, i) => `${i + 1}. [${f.title}]: ${f.detail}`)
-        .join('\n\n')
-
-      return `===================================================================
-EVIDENTIARY EXHIBIT FOR E-NIVARAN / E-FILING PORTAL GRIEVANCE
-===================================================================
-Taxpayer Persona: ${profile.personaLabel}
-Assessment Year: ${profile.assessmentYear}
-Verification Run: ${formatDateTime(timeNow)}
-Client Fingerprint Desk: Sakshya Browser Evidentiary Sub-system
-
-SUMMARY OF OBJECTIVE DISCREPANCIES:
--------------------------------------------------------------------
-${issues || 'All examined tax records agree. No active discrepancies flagged.'}
-
-SUPPORTING DOCUMENTS IN RECORD:
--------------------------------------------------------------------
-${docList}
-
-DECLARATION:
-The objective differences above are compiled from taxpayer-held source
-documents against portal records. Generated without external API transmission.
-===================================================================`
-    }
-
-    if (exhibitTab === 'ais') {
-      const aisItems = profile.aisInterest
-        .map(
-          (item) =>
-            `- Payer: ${item.payer} | Amount: ${formatRupees(item.amountPaise)} | Reported: ${item.reportedOn}`,
-        )
-        .join('\n')
-
-      return `===================================================================
-AIS (ANNUAL INFORMATION STATEMENT) FEEDBACK & RECONCILIATION NOTE
-===================================================================
-Taxpayer Persona: ${profile.personaLabel}
-Assessment Year: ${profile.assessmentYear}
-Declared Interest in ITR: ${formatRupees(profile.declaredInterestPaise)}
-AIS Total Interest Reported: ${formatRupees(aisInterestTotal(profile))}
-
-RECORDED AIS LINE-ITEMS:
-${aisItems}
-
-OBJECTIVE REMARKS:
-${
-  profile.aisInterest.length > 1 &&
-  profile.aisInterest[0].amountPaise === profile.aisInterest[1]?.amountPaise
-    ? 'Feedback Category: "Information is duplicate / included in other information"\nJustification: Identical amount and payer reported under multiple entries for the same deposit account.'
-    : 'Feedback Category: "Information is correct / partial disagreement"\nJustification: Declared figures reconciled with bank certificates.'
-}
-===================================================================`
-    }
-
-    return `===================================================================
-TRACES / FORM 26AS DEDUCTOR RECTIFICATION REQUEST NOTE
-===================================================================
-Taxpayer Persona: ${profile.personaLabel}
-Assessment Year: ${profile.assessmentYear}
-Form 16 Stated TDS: ${formatRupees(profile.form16TdsPaise)}
-Form 26AS Credited TDS: ${formatRupees(profile.form26asTdsPaise)}
-Difference to be Reconciled: ${formatRupees(Math.abs(profile.form16TdsPaise - profile.form26asTdsPaise))}
-
-DEDUCTOR DETAILS:
-${(profile.deductors ?? [])
-  .map(
-    (d) =>
-      `* Deductor: ${d.deductorName} (TAN: ${d.tan})\n  Withheld: ${formatRupees(d.amountPaise)} | Form 24Q Quarterly Status: ${d.form16QuarterlyFiled ? 'Filed' : 'Pending Upload to TRACES'}`,
-  )
-  .join('\n')}
-
-REQUEST TO DEDUCTOR:
-Please verify Form 24Q quarterly returns and file correction statement
-on TRACES portal to ensure tax credit reflects against PAN in Form 26AS.
-===================================================================`
-  }, [profile, findings, exhibitTab, fingerprints])
-
-  const copyExhibit = async () => {
-    try {
-      await navigator.clipboard.writeText(exhibitText)
-      setCopiedExhibit(true)
-      setTimeout(() => setCopiedExhibit(false), 2000)
-    } catch {
-      // ignore
-    }
-  }
 
   return (
     <>
@@ -471,7 +235,7 @@ on TRACES portal to ensure tax credit reflects against PAN in Form 26AS.
               >
                 <div className="picker__item-header">
                   <span className="picker__item-title">{item.personaLabel}</span>
-                  <span className="picker__item-badge">AY {item.assessmentYear}</span>
+                  <span className="picker__item-badge">{item.assessmentYear}</span>
                 </div>
                 <p className="picker__item-desc">{item.situation}</p>
               </button>
@@ -485,7 +249,7 @@ on TRACES portal to ensure tax credit reflects against PAN in Form 26AS.
           <div className="case__info">
             <div className="case__badge-row">
               <span className="badge badge--dark">{profile.personaLabel}</span>
-              <span className="badge badge--neutral">Assessment Year {profile.assessmentYear}</span>
+              <span className="badge badge--neutral">{profile.assessmentYear}</span>
               <span className="badge badge--regime">{profile.documents.length} Records Verified</span>
             </div>
             <h2 className="case__title" id="case-heading">
@@ -494,6 +258,7 @@ on TRACES portal to ensure tax credit reflects against PAN in Form 26AS.
             <p className="case__meta">
               Filing Due: <strong>{formatDateTime(profile.dueDate)}</strong> &bull; Brief assembled in browser: <strong>{formatDateTime(new Date().toISOString())}</strong>
             </p>
+            <ClockStrip profile={profile} />
           </div>
           <div className="case__actions no-print">
             <button
@@ -950,57 +715,16 @@ on TRACES portal to ensure tax credit reflects against PAN in Form 26AS.
         )}
       </section>
 
-      {/* e-Nivaran & AIS Exhibit Generator Section */}
+      {/* Copy-ready text of the same findings, shared with the own-figures page. */}
       <section className="panel no-print" aria-labelledby="exhibit-heading">
-        <div className="panel__header-row">
-          <div>
-            <h2 className="panel__heading" id="exhibit-heading">
-              <SendHorizontal aria-hidden size={18} /> e-Nivaran & AIS Feedback Exhibit Generator
-            </h2>
-            <p className="panel__note">
-              Format objective discrepancy evidence into standardized, copy-ready submission blocks with SHA-256 integrity hashes for grievance filings.
-            </p>
-          </div>
+        <div id="exhibit-heading" className="visually-hidden">
+          Copy-ready text
         </div>
-
-        <div className="exhibit-panel">
-          <div className="exhibit-tabs">
-            <button
-              type="button"
-              className={`exhibit-tab ${exhibitTab === 'enivaran' ? 'exhibit-tab--active' : ''}`}
-              onClick={() => setExhibitTab('enivaran')}
-            >
-              <FileText size={15} /> e-Nivaran Portal Grievance Exhibit
-            </button>
-            <button
-              type="button"
-              className={`exhibit-tab ${exhibitTab === 'ais' ? 'exhibit-tab--active' : ''}`}
-              onClick={() => setExhibitTab('ais')}
-            >
-              <HelpCircle size={15} /> AIS Feedback Note
-            </button>
-            <button
-              type="button"
-              className={`exhibit-tab ${exhibitTab === 'traces' ? 'exhibit-tab--active' : ''}`}
-              onClick={() => setExhibitTab('traces')}
-            >
-              <Building2 size={15} /> Deductor TRACES Request
-            </button>
-          </div>
-
-          <div className="exhibit-codeblock">
-            <button
-              type="button"
-              className="exhibit-copy-btn"
-              onClick={copyExhibit}
-              title="Copy exhibit text to clipboard"
-            >
-              {copiedExhibit ? <Check size={13} /> : <Copy size={13} />}
-              <span>{copiedExhibit ? 'Copied to Clipboard' : 'Copy Exhibit'}</span>
-            </button>
-            {exhibitText}
-          </div>
-        </div>
+        <ExhibitPanel
+          profile={profile}
+          findings={findings}
+          fingerprints={fingerprints}
+        />
       </section>
 
       {/* Resilience & Technical Playbook */}
@@ -1086,6 +810,7 @@ on TRACES portal to ensure tax credit reflects against PAN in Form 26AS.
             <p className="panel__note">
               Every supporting document is cryptographically fingerprinted in-browser via SHA-256 to ensure evidentiary integrity.
             </p>
+            <LedgerDownload profile={profile} fingerprints={fingerprints} />
           </div>
         </div>
 

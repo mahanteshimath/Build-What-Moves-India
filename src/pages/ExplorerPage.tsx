@@ -553,10 +553,13 @@ export default function ExplorerPage() {
         <div className="panel__header-row">
           <div>
             <h2 className="panel__heading" id="explorer-heading">
-              <Database aria-hidden size={20} /> Synthetic Practice Corpus & Analytical Engine
+              <Database aria-hidden size={20} /> How common is each of these failures?
             </h2>
             <p className="panel__note">
-              Inspect test metrics, relational view definitions, and discrepancy distributions computed across the deterministic verification suite.
+              One person&rsquo;s mismatch looks like bad luck. The same mismatch across a
+              population looks like a system. This runs the same deterministic checks
+              over a synthetic corpus, so the prevalence of each failure shape can be
+              counted rather than asserted.
             </p>
           </div>
         </div>

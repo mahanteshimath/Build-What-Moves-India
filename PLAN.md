@@ -14,6 +14,11 @@ Not a filing utility. Filing utilities are the diverging frontends whose logic d
 - [x] Verified official URLs isolated in `src/data/sources.ts`
 - [x] Fifteen pure checks in `src/rules/checks.ts`
 - [x] Forty-eight tests across `src/rules/` and `src/data/`, including silence cases and boundary cases
+- [x] Hand-entered figures at `/my-case`, running the same checks, with nothing uploaded or stored
+- [x] A remedy on every finding: the route, who has to act, and the portal service it goes through
+- [x] Statutory clocks for the filing due date, the e-verification window and a notice response date
+- [x] Ledger download carrying the hashed text, so a third party can recompute each digest
+- [x] Both AY 2026-27 due dates represented (31 July, and 31 August for ITR-3 / ITR-4)
 - [x] Three surfaces in `src/App.tsx` — situation picker, findings with two-value comparisons, evidence ledger
 - [x] In-browser SHA-256 fingerprinting via `crypto.subtle`
 - [x] Print brief via `window.print()` with print-only stylesheet

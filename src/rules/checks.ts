@@ -2,11 +2,17 @@ import type { Finding, TaxProfile } from '../domain/tax'
 import { formatDate, formatDateTime, formatRupees, gapBetween } from '../domain/tax'
 import {
   aisFaq,
+  complyToNotice,
   everifyFaq,
+  everifyService,
+  grievanceService,
   itrFaq,
+  knowPaymentStatus,
   linkAadhaarHelp,
+  linkAadhaarService,
   portalHome,
   tdsMismatchHelp,
+  tracesPortal,
 } from '../data/sources'
 
 /** Amounts and windows below come from the local research report, not an official page. */
@@ -41,6 +47,13 @@ const challanCredit: Check = (profile) =>
             },
             right: { source: 'Taxes-paid schedule', value: 'Not listed' },
           },
+          remedy: {
+            route: 'Confirm the payment against the Department\u2019s own record',
+            actor: 'You',
+            detail:
+              'Check the challan status on the portal. If the payment shows there but not in the taxes-paid schedule, the two Department records disagree with each other, and this brief records that difference with the CIN.',
+            service: knowPaymentStatus,
+          },
         } satisfies Finding,
       ]
     }
@@ -64,6 +77,13 @@ const challanCredit: Check = (profile) =>
               source: 'Taxes-paid schedule',
               value: formatRupees(credit.amountPaise),
             },
+          },
+          remedy: {
+            route: 'Confirm the paid amount against the Department\u2019s own record',
+            actor: 'You',
+            detail:
+              'Check the challan status on the portal and compare it against the amount carried into the taxes-paid schedule.',
+            service: knowPaymentStatus,
           },
         } satisfies Finding,
       ]
@@ -103,6 +123,13 @@ const deadlineGap: Check = (profile) => {
           value: formatDateTime(profile.filedOn),
         },
       },
+      remedy: {
+        route: 'Grievance recording the payment timestamp',
+        actor: 'You',
+        detail:
+          'Both timestamps above, with the CIN, are the record a grievance would rest on. Print this brief and attach the challan receipt.',
+        service: grievanceService,
+      },
     },
   ]
 }
@@ -133,6 +160,12 @@ const rebateOnSpecialRate: Check = (profile) => {
         },
         right: { source: 'Special-rate income reported', value: sections },
       },
+      remedy: {
+        route: 'Keep the preparation-utility computation sheet',
+        actor: 'You',
+        detail:
+          'Save or print the computation the preparation utility produced, showing the rebate it accepted. If processing later disallows it, that sheet is the only record of what the utility showed at the time.',
+      },
     },
   ]
 }
@@ -161,6 +194,13 @@ const tdsMatch: Check = (profile) => {
           source: 'Form 26AS',
           value: formatRupees(profile.form26asTdsPaise),
         },
+      },
+      remedy: {
+        route: 'Deductor corrects the TDS statement on TRACES',
+        actor: 'Your deductor',
+        detail:
+          'Only the deductor can revise a filed TDS statement. Form 26AS changes after they file a correction; the Form 16 in your hand is the record of what they certified.',
+        service: tracesPortal,
       },
     },
   ]
@@ -194,6 +234,13 @@ const claimedTds: Check = (profile) => {
           value: formatRupees(profile.form26asTdsPaise),
         },
       },
+      remedy: {
+        route: 'Reconcile the claim against the credit statement',
+        actor: 'You',
+        detail:
+          'Either the claim in the return or the credit in Form 26AS is the one that needs correcting. Establish which record is right before changing either.',
+        service: tdsMismatchHelp,
+      },
     },
   ]
 }
@@ -215,6 +262,13 @@ const npsCap: Check = (profile) => {
         label: 'Employer contribution deduction',
         left: { source: 'Return', value: `${profile.npsClaimPercent}%` },
         right: { source: 'Form 16', value: `${profile.form16NpsCapPercent}%` },
+      },
+      remedy: {
+        route: 'Ask the employer to reissue Form 16 with the current cap',
+        actor: 'Your deductor',
+        detail:
+          'Where the Form 16 field still states an older cap, the employer is the only party who can reissue it. Keep the original alongside the reissued copy so both are on record.',
+        service: tracesPortal,
       },
     },
   ]
@@ -245,6 +299,13 @@ const aisDuplicates: Check = (profile) => {
           left: { source: 'Annual Information Statement', value: `${count} entries` },
           right: { source: 'Payer certificate', value: '1 entry' },
         },
+        remedy: {
+          route: 'AIS feedback marking the entry as duplicated',
+          actor: 'You',
+          detail:
+            'Submit feedback against the repeated entry in the Annual Information Statement. The payer certificate for this deposit is the record that shows what was actually credited.',
+          service: aisFaq,
+        },
       } satisfies Finding
     })
 }
@@ -274,6 +335,13 @@ const interestDeclared: Check = (profile) => {
         left: { source: 'Return, declared', value: formatRupees(profile.declaredInterestPaise) },
         right: { source: 'AIS total', value: formatRupees(aisTotal) },
       },
+      remedy: {
+        route: 'Reconcile against the payer certificates',
+        actor: 'You',
+        detail:
+          'Total the interest certificates you hold. Where they disagree with the statement, AIS feedback is the route that records your figure against it.',
+        service: aisFaq,
+      },
     },
   ]
 }
@@ -295,6 +363,12 @@ const everification: Check = (profile) => {
         label: 'Verification',
         left: { source: 'Submitted on', value: formatDate(profile.filedOn) },
         right: { source: 'Verified on', value: 'Not recorded' },
+      },
+      remedy: {
+        route: 'e-Verify the return',
+        actor: 'You',
+        detail: `Verification is what moves a submitted return into the processing queue. Official guidance describes a ${EVERIFICATION_WINDOW_DAYS}-day window, and several routes besides Aadhaar OTP.`,
+        service: everifyService,
       },
     },
   ]
@@ -324,6 +398,12 @@ const refundBand: Check = (profile) => {
           value: formatRupees(REFUND_REVIEW_BAND_PAISE),
         },
       },
+      remedy: {
+        route: 'Keep the deduction evidence assembled',
+        actor: 'The Department',
+        detail:
+          'Nothing needs correcting here. This notes only that the claim sits above a band research notes associate with longer automated review, so the supporting evidence is worth keeping together.',
+      },
     },
   ]
 }
@@ -343,8 +423,13 @@ const noticeEvidence: Check = (profile) => {
         title: `Notice under section ${notice.code} — every named document is on record`,
         detail: `${notice.title}. The response date recorded on the notice is ${formatDate(notice.respondBy)}.`,
         documentIds: [notice.documentId, ...notice.requiredDocumentIds],
-        source: portalHome,
-      },
+        source: portalHome,        remedy: {
+          route: 'Respond through Comply to Notice',
+          actor: 'You',
+          detail:
+            'Every document the notice names is in this ledger. Confirm the notice is genuine using the Department\u2019s authentication service before responding.',
+          service: complyToNotice,
+        },      },
     ]
   }
 
@@ -366,6 +451,13 @@ const noticeEvidence: Check = (profile) => {
           source: 'Present in ledger',
           value: `${notice.requiredDocumentIds.length - missing.length}`,
         },
+      },
+      remedy: {
+        route: 'Respond through Comply to Notice',
+        actor: 'You',
+        detail:
+          'Before responding, confirm the notice is genuine using the Department\u2019s own authentication service. The response carries whichever named documents you hold; this brief records which ones those are.',
+        service: complyToNotice,
       },
     },
   ]
@@ -403,6 +495,13 @@ const bankAccountReadiness: Check = (profile) => {
           value: issues.join(' | '),
         },
       },
+      remedy: {
+        route: 'Pre-validate the refund account on the portal',
+        actor: 'You',
+        detail:
+          'The refund cannot be credited until the account is pre-validated and the holder name matches the PAN database. This is done under Profile, in the My Bank Account section.',
+        service: portalHome,
+      },
     },
   ]
 }
@@ -434,6 +533,13 @@ const panAadhaarOperative: Check = (profile) => {
           value: panAadhaar.operative ? 'Operative' : 'Inoperative',
         },
       },
+      remedy: {
+        route: 'Link Aadhaar with PAN and check the status',
+        actor: 'You',
+        detail:
+          'Linkage status can be checked and started from the portal without signing in. The status shown there is the record that governs.',
+        service: linkAadhaarService,
+      },
     },
   ]
 }
@@ -464,6 +570,13 @@ const unreflectedTdsQuarter: Check = (profile) => {
         value: 'Statement not filed by deductor',
       },
     },
+    remedy: {
+      route: 'Deductor files the pending quarterly statement',
+      actor: 'Your deductor',
+      detail:
+        'The credit reaches Form 26AS only after the deductor files the quarterly statement. The Form 16 in your hand is the record that they deducted it.',
+      service: tracesPortal,
+    },
   }))
 }
 
@@ -491,6 +604,13 @@ const demandOffsetLedger: Check = (profile) => {
           source: 'Outstanding demand',
           value: formatRupees(profile.outstandingDemandPaise),
         },
+      },
+      remedy: {
+        route: 'Ask for the assessment order behind the demand',
+        actor: 'You',
+        detail:
+          'A demand rests on an assessment order. Where no order is on record, the absence of that document is itself the thing to put in writing, and a grievance is the route that records it.',
+        service: grievanceService,
       },
     },
   ]

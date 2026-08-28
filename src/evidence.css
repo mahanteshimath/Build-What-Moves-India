@@ -1,0 +1,176 @@
+/* ---- Remedy block on a finding ---------------------------------------- */
+
+.remedy {
+  margin-top: 0.85rem;
+  padding: 0.7rem 0.8rem;
+  border-left: 3px solid var(--gov-navy-light);
+  background: var(--gov-navy-subtle);
+  border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+}
+
+.remedy__head {
+  display: flex;
+  align-items: center;
+  gap: 0.45rem;
+  flex-wrap: wrap;
+}
+
+.remedy__route {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--gov-navy-dark);
+}
+
+.remedy__actor {
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  padding: 0.1rem 0.4rem;
+  border-radius: var(--radius-sm);
+  background: var(--gov-surface);
+  border: 1px solid var(--gov-border);
+  color: var(--gov-text-muted);
+}
+
+.remedy__detail {
+  margin: 0.35rem 0 0;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--gov-text);
+}
+
+.remedy__service {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.3rem;
+  margin-top: 0.45rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: var(--gov-navy-primary);
+}
+
+/* ---- Statutory clocks -------------------------------------------------- */
+
+.clocks {
+  margin-top: 0.9rem;
+}
+
+.clocks__label {
+  display: flex;
+  align-items: center;
+  gap: 0.35rem;
+  margin: 0 0 0.45rem;
+  font-size: 0.78rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+  color: var(--gov-text-muted);
+}
+
+.clocks__list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0.5rem;
+}
+
+.clock {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 0.15rem 0.5rem;
+  padding: 0.55rem 0.7rem;
+  border: 1px solid var(--gov-border-light);
+  border-left-width: 3px;
+  border-radius: var(--radius-sm);
+  background: var(--gov-surface);
+}
+
+.clock__label {
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--gov-text);
+}
+
+.clock__date {
+  font-size: 0.82rem;
+  color: var(--gov-text-muted);
+  white-space: nowrap;
+}
+
+.clock__remaining {
+  grid-column: 1 / -1;
+  font-size: 0.9rem;
+  font-weight: 700;
+}
+
+.clock__detail {
+  grid-column: 1 / -1;
+  font-size: 0.75rem;
+  color: var(--gov-text-light);
+}
+
+.clock--open {
+  border-left-color: var(--gov-navy-light);
+}
+
+.clock--open .clock__remaining {
+  color: var(--gov-navy-primary);
+}
+
+.clock--due-soon {
+  border-left-color: var(--gov-amber);
+  background: var(--gov-amber-soft);
+}
+
+.clock--due-soon .clock__remaining {
+  color: var(--gov-amber);
+}
+
+.clock--lapsed {
+  border-left-color: var(--gov-red);
+  background: var(--gov-red-soft);
+}
+
+.clock--lapsed .clock__remaining {
+  color: var(--gov-red-dark);
+}
+
+.clock--met {
+  border-left-color: var(--gov-green);
+  background: var(--gov-green-soft);
+}
+
+.clock--met .clock__remaining {
+  color: var(--gov-green-dark);
+}
+
+/* A colour difference alone must not be the only signal. */
+.clock__remaining::before {
+  margin-right: 0.3rem;
+  font-weight: 700;
+}
+
+.clock--due-soon .clock__remaining::before {
+  content: 'Due ';
+}
+
+.clock--lapsed .clock__remaining::before {
+  content: 'Passed ';
+}
+
+.clock--met .clock__remaining::before {
+  content: 'Met — ';
+}
+
+.clock--open .clock__remaining::before {
+  content: 'Due ';
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .clock {
+    transition: border-color 120ms ease;
+  }
+}

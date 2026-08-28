@@ -1,0 +1,57 @@
+/* ---- Exhibit panel, shared by the persona brief and the own-figures brief -- */
+
+.exhibit {
+  background: var(--gov-surface-alt);
+  border: 1px solid var(--gov-border);
+  border-radius: var(--radius-md);
+  padding: 1.25rem;
+  margin-top: 1.25rem;
+}
+
+.exhibit__tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  border-bottom: 1px solid var(--gov-border);
+  padding-bottom: 0.5rem;
+  margin: 0.75rem 0 1rem;
+}
+
+.exhibit__tab {
+  background: transparent;
+  border: 1px solid transparent;
+  font: inherit;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--gov-text-muted);
+  padding: 0.4rem 0.75rem;
+  border-radius: var(--radius-sm);
+  cursor: pointer;
+}
+
+.exhibit__tab:hover {
+  color: var(--gov-navy-darkest);
+}
+
+.exhibit__tab--active {
+  color: var(--gov-navy-darkest);
+  background: var(--gov-surface);
+  border-color: var(--gov-border);
+  box-shadow: var(--shadow-sm);
+}
+
+.exhibit__text {
+  margin: 0;
+  background: #0f172a;
+  color: #f8fafc;
+  border-radius: var(--radius-sm);
+  padding: 1rem 1.25rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace;
+  font-size: 0.82rem;
+  line-height: 1.6;
+  /* The text is meant to be read and copied, never scrolled sideways. */
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  max-height: 22rem;
+  overflow-y: auto;
+}

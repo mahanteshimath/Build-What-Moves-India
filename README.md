@@ -27,9 +27,15 @@ In each case the citizen holds the contradicting record and has no way to **asse
 
 **Reconcile** — 15 deterministic checks run over a taxpayer profile, each reporting an objective difference between two named records, with both values shown side by side.
 
-**Prove** — every record is fingerprinted with SHA-256 in the browser via `crypto.subtle`, so the copy you hold can be shown to be the copy you captured.
+**Use your own figures** — the same 15 checks run against numbers you type in yourself, at `/my-case`. Nothing is uploaded, nothing is stored, and refreshing the page clears it.
 
-**Contest** — the whole brief prints to one page through `window.print()`, carrying the comparisons, the records used, and the official links.
+**Act** — every finding names the correction route, who has to act on it (you, your deductor, or the Department), and links the portal service that route goes through.
+
+**Track the clock** — the dates already on the documents (filing due date, the 30-day e-verification window, a notice response date) are shown with the plain time remaining.
+
+**Prove** — every record is fingerprinted with SHA-256 in the browser via `crypto.subtle`, and the ledger downloads as text carrying the exact string each digest was taken over, so a third party can recompute it.
+
+**Contest** — the whole brief prints to one page, carrying the comparisons, the records used, and the official links.
 
 ## The checks
 
@@ -53,9 +59,13 @@ In each case the citizen holds the contradicting record and has no way to **asse
 
 Every check is a pure function tested in [src/rules/checks.test.ts](src/rules/checks.test.ts). No model sits in the correctness path.
 
+A test asserts that every finding carries a remedy naming who has to act, and that every URL a remedy cites is one of the verified sources in [src/data/sources.ts](src/data/sources.ts).
+
 ## Profiles
 
 Nine synthetic taxpayers, one per issue category: `deadline-payment`, `rebate-capital-gains`, `ais-duplicate`, `unreflected-tds-q4`, `bank-preval-stalled`, `pan-inoperative-234h`, `notice-response`, `refund-review`, and `clean-filing` — which reconciles fully and returns a ready state.
+
+The research records two statutory due dates for AY 2026-27: 31 July for salaried and other non-audit filers, and 31 August for non-audit business and professional filers. `refund-review` files against the later one.
 
 ## Run it
 
@@ -80,6 +90,7 @@ npm run build
 4. Switch to **Nandini** — every record agrees, all 15 checks clear.
 5. Scroll to the evidence ledger and show the live SHA-256 fingerprints.
 6. Open devtools, show the brief making no outbound request, then **Print this brief**.
+7. Open **Your Own Figures** and type Priya’s numbers in by hand — the same three findings come back. Refresh, and they are gone.
 
 Demo sign-in: `demo` / `sakshya-demo`. These credentials are fictional and ship inside the bundle; the gate exists to show the walkthrough, not to protect anything.
 

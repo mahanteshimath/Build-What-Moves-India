@@ -7,6 +7,7 @@ export type DocumentKind =
   | 'challan'
   | 'return'
   | 'notice'
+  | 'other'
 
 export interface OfficialSource {
   label: string
@@ -136,6 +137,19 @@ export interface Comparison {
   right: { source: string; value: string }
 }
 
+/**
+ * Where a difference gets corrected, and who holds the record that has to change.
+ * States the documented route only; it is not advice about what to claim.
+ */
+export interface Remedy {
+  /** Short name of the route, e.g. "AIS feedback". */
+  route: string
+  /** Who has to act: the taxpayer, the deductor, or the Department. */
+  actor: 'You' | 'Your deductor' | 'The Department'
+  detail: string
+  service?: OfficialSource
+}
+
 export interface Finding {
   id: string
   severity: Severity
@@ -144,6 +158,7 @@ export interface Finding {
   documentIds: string[]
   source: OfficialSource
   comparison?: Comparison
+  remedy?: Remedy
 }
 
 /** Stable text a document's fingerprint is computed over. */

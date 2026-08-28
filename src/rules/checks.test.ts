@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { profileById, profiles } from '../data/profiles'
+import { officialSources } from '../data/sources'
 import { REFUND_REVIEW_BAND_PAISE, checks, reviewProfile } from './checks'
 
 const idsFor = (id: string) => reviewProfile(profileById(id)).map((f) => f.id)
@@ -14,6 +15,30 @@ describe('profile library', () => {
     for (const profile of profiles) {
       expect(() => reviewProfile(profile)).not.toThrow()
       expect(reviewProfile(profile).length).toBeGreaterThan(0)
+    }
+  })
+
+  it('gives every finding a remedy naming who has to act', () => {
+    const actors = new Set(['You', 'Your deductor', 'The Department'])
+    for (const profile of profiles) {
+      for (const finding of reviewProfile(profile)) {
+        if (finding.id === 'all-clear') continue
+        expect(finding.remedy, `${finding.id} has no remedy`).toBeDefined()
+        expect(actors).toContain(finding.remedy?.actor)
+        expect(finding.remedy?.route.length).toBeGreaterThan(0)
+      }
+    }
+  })
+
+  it('points every remedy service at an official source on record', () => {
+    const known = new Set(officialSources.map((source) => source.url))
+    for (const profile of profiles) {
+      for (const finding of reviewProfile(profile)) {
+        if (!finding.remedy?.service) continue
+        expect(known, `${finding.id} cites an unlisted URL`).toContain(
+          finding.remedy.service.url,
+        )
+      }
     }
   })
 })

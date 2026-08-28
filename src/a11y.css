@@ -1,0 +1,118 @@
+/* ---- Accessibility and small-screen pass -------------------------------- */
+
+/* Every interactive control needs a visible focus ring, not just the ones
+   that happen to inherit one. */
+a:focus-visible,
+button:focus-visible,
+input:focus-visible,
+select:focus-visible,
+textarea:focus-visible,
+[tabindex]:focus-visible {
+  outline: 3px solid var(--gov-saffron);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* Touch targets below roughly 44px are hard to hit accurately on a phone. */
+@media (pointer: coarse) {
+  .button,
+  .topbar__link,
+  .picker__item,
+  .tally__item,
+  .own-check,
+  .lever__snap {
+    min-height: 2.75rem;
+  }
+
+  .own-check input[type='checkbox'] {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+}
+
+@media (max-width: 48rem) {
+  .topbar__inner {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .topbar__nav {
+    width: 100%;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .gov-topbar__inner {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .case {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .clocks__list {
+    grid-template-columns: 1fr;
+  }
+
+  .compare__pair {
+    grid-template-columns: 1fr;
+  }
+
+  /* Long identifiers such as a CIN must not force the page sideways. */
+  .compare__value,
+  .ledger__reference,
+  .finding__doc-chip {
+    overflow-wrap: anywhere;
+  }
+
+  .ledger__row {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+@media (prefers-contrast: more) {
+  .finding,
+  .clock,
+  .own-group,
+  .remedy {
+    border-width: 2px;
+  }
+}
+
+/* The remedy block carries the action, so it has to survive printing. */
+@media print {
+  .remedy {
+    border-left: 2px solid #000000 !important;
+    background: transparent !important;
+  }
+
+  .remedy__actor {
+    border: 1px solid #000000 !important;
+    color: #000000 !important;
+  }
+
+  .clock {
+    border: 1px solid #000000 !important;
+    background: transparent !important;
+  }
+
+  .clock__remaining {
+    color: #000000 !important;
+  }
+}

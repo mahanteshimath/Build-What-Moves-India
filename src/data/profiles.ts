@@ -4,6 +4,9 @@ const rupees = (amount: number) => Math.round(amount * 100)
 
 const DUE_DATE = '2026-07-31T23:59:00+05:30'
 
+/** Non-audit business and professional filers (ITR-3, ITR-4) file a month later. */
+const DUE_DATE_BUSINESS = '2026-08-31T23:59:00+05:30'
+
 export const profiles: TaxProfile[] = [
   {
     id: 'deadline-payment',
@@ -582,9 +585,9 @@ export const profiles: TaxProfile[] = [
 
   {
     id: 'refund-review',
-    personaLabel: 'Rohit — large refund, advance tax paid',
+    personaLabel: 'Rohit \u2014 non-audit professional, advance tax paid',
     situation:
-      'Paid advance tax in March and claimed a refund. The advance tax entry did not carry into the return.',
+      'Files ITR-3 against the 31 August due date. Paid advance tax in March and claimed a refund. The advance tax entry did not carry into the return.',
     assessmentYear: 'AY 2026-27',
     documents: [
       {
@@ -606,13 +609,13 @@ export const profiles: TaxProfile[] = [
       {
         id: 'r-return',
         kind: 'return',
-        label: 'ITR-2 acknowledgement',
+        label: 'ITR-3 acknowledgement',
         reference: 'ACK 8836540260720',
         capturedAt: '2026-07-20T10:02:00+05:30',
         note: 'Submitted return awaiting verification.',
       },
     ],
-    dueDate: DUE_DATE,
+    dueDate: DUE_DATE_BUSINESS,
     filedOn: '2026-07-20T10:00:00+05:30',
     everifiedOn: null,
     challans: [
