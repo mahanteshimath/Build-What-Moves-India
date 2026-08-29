@@ -2,6 +2,8 @@ import { Navigate, NavLink, Route, Routes, useLocation } from 'react-router-dom'
 import type { ReactNode } from 'react'
 import { ArrowUpRight, Award, CircleAlert, Compass, Database, FileText, LogOut, PencilLine, ShieldCheck, User } from 'lucide-react'
 import { useAuth } from './auth-context'
+import { GuidedTour } from './components/GuidedTour'
+import { startTour } from './components/startTour'
 import { officialSources } from './data/sources'
 import { checks } from './rules/checks'
 import BriefPage from './pages/BriefPage'
@@ -88,6 +90,15 @@ function TopBar() {
           </NavLink>
         </nav>
         <div className="topbar__account">
+          <button
+            type="button"
+            className="button button--quiet button--sm"
+            onClick={startTour}
+            title="Walk through the desk one control at a time"
+          >
+            <Compass aria-hidden size={14} />
+            <span>Guided tour</span>
+          </button>
           <div className="topbar__user-badge">
             <User aria-hidden size={14} />
             <span className="topbar__who">{user.name}</span>
@@ -175,6 +186,8 @@ export default function App() {
       </header>
 
       <TopBar />
+
+      <GuidedTour enabled={Boolean(user)} />
 
       <main className="layout" id="main">
         <Routes>

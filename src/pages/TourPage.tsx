@@ -4,6 +4,7 @@ import {
   Award,
   CircleAlert,
   Clipboard,
+  Compass,
   Database,
   Fingerprint,
   Keyboard,
@@ -18,6 +19,7 @@ import {
   WifiOff,
 } from 'lucide-react'
 import { useAuth } from '../auth-context'
+import { startTour } from '../components/startTour'
 import { portalIssues } from '../data/portalIssues'
 import { profiles } from '../data/profiles'
 import { checks } from '../rules/checks'
@@ -176,13 +178,25 @@ export default function TourPage() {
           you already hold, and hands you a page you can carry.
         </p>
         <div className="tour__cta no-print">
-          <Link className="button" to={gate('/brief')}>
-            {user ? 'Open the Evidentiary Brief' : 'Sign in to the demo'}
+          {user ? (
+            <button type="button" className="button" onClick={startTour}>
+              <Compass aria-hidden size={16} />
+              Take the guided walkthrough
+            </button>
+          ) : (
+            <Link className="button" to="/login">
+              Sign in to start the guided walkthrough
+            </Link>
+          )}
+          <Link className="button button--quiet" to={gate('/brief')}>
+            {user ? 'Skip to the Evidentiary Brief' : 'Sign in to the demo'}
           </Link>
-          <a className="button button--quiet" href="#tour-walkthrough">
-            Take the walkthrough
-          </a>
         </div>
+        <p className="panel__note">
+          The walkthrough opens each tab in turn and points at the control being described.
+          Arrow keys move between steps; Esc leaves it. Everything below is the same material,
+          to read at your own pace.
+        </p>
       </section>
 
       <section className="panel" aria-labelledby="tour-compare-heading">
@@ -218,7 +232,16 @@ export default function TourPage() {
           Walkthrough &mdash; five tabs, in order
         </h2>
         <p className="panel__note">
-          Each step is one tab in the bar above. Read them in this order the first time.
+          Each step is one tab in the bar above. Read them in this order the first time, or
+          {' '}
+          {user ? (
+            <button type="button" className="tour__inline-start" onClick={startTour}>
+              run the guided version
+            </button>
+          ) : (
+            <Link to="/login">sign in for the guided version</Link>
+          )}
+          {' '}that points at each control on the page.
         </p>
         <ol className="tour__steps">
           {STEPS.map((step, index) => {
@@ -281,7 +304,13 @@ export default function TourPage() {
           <li>Income Tax only. All profiles are synthetic; the sign-in is a demo gate, not security.</li>
         </ul>
         <div className="tour__cta no-print">
-          <Link className="button" to={gate('/brief')}>
+          {user && (
+            <button type="button" className="button" onClick={startTour}>
+              <Compass aria-hidden size={16} />
+              Take the guided walkthrough
+            </button>
+          )}
+          <Link className={`button ${user ? 'button--quiet' : ''}`} to={gate('/brief')}>
             {user ? 'Open the Evidentiary Brief' : 'Sign in to the demo'}
           </Link>
         </div>

@@ -1,0 +1,127 @@
+/* Guided walkthrough: a spotlight on the real control, plus a step card. */
+.tourguide__blocker {
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(2, 6, 23, 0.55);
+}
+
+.tourguide__spot {
+  position: fixed;
+  z-index: 2001;
+  pointer-events: none;
+  border-radius: var(--radius-md);
+  border: 2px solid var(--gov-saffron);
+  background: transparent;
+  box-shadow: 0 0 0 9999px rgba(2, 6, 23, 0.55);
+  transition: top 120ms ease, left 120ms ease, width 120ms ease, height 120ms ease;
+}
+
+.tourguide__card {
+  position: fixed;
+  z-index: 2002;
+  background: var(--gov-surface);
+  border: 1px solid var(--gov-border);
+  border-top: 4px solid var(--gov-navy-primary);
+  border-radius: var(--radius-md);
+  box-shadow: var(--shadow-lg);
+  padding: 14px 16px 16px;
+  max-height: min(70vh, 460px);
+  overflow-y: auto;
+}
+
+.tourguide__card:focus {
+  outline: none;
+}
+
+.tourguide__head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.tourguide__count {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.76rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--gov-text-light);
+}
+
+.tourguide__close {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  border: 1px solid var(--gov-border-light);
+  border-radius: var(--radius-sm);
+  background: transparent;
+  color: var(--gov-text-muted);
+  cursor: pointer;
+}
+
+.tourguide__close:hover {
+  background: var(--gov-surface-alt);
+  color: var(--gov-text);
+}
+
+.tourguide__progress {
+  height: 3px;
+  margin: 10px 0 12px;
+  border-radius: 2px;
+  background: var(--gov-border-light);
+  overflow: hidden;
+}
+
+.tourguide__progress span {
+  display: block;
+  height: 100%;
+  background: var(--gov-saffron);
+  transition: width 160ms ease;
+}
+
+.tourguide__title {
+  margin: 0;
+  font-size: 1.02rem;
+  color: var(--gov-navy-primary);
+}
+
+.tourguide__body {
+  margin: 6px 0 0;
+  font-size: 0.9rem;
+  line-height: 1.5;
+  color: var(--gov-text);
+}
+
+.tourguide__tip {
+  margin: 8px 0 0;
+  padding-left: 10px;
+  border-left: 3px solid var(--gov-saffron);
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--gov-text-muted);
+}
+
+.tourguide__actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-top: 14px;
+}
+
+.tourguide__nav {
+  display: flex;
+  gap: 8px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .tourguide__spot,
+  .tourguide__progress span {
+    transition: none;
+  }
+}
