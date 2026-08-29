@@ -45,12 +45,13 @@ function TopBar() {
           </NavLink>
           <NavLink
             to="/issues"
+            title="Documented portal issues drawn from the research corpus"
             className={({ isActive }) =>
               `topbar__link ${isActive ? 'topbar__link--active' : ''}`
             }
           >
             <CircleAlert aria-hidden size={16} />
-            <span>Documented Portal Issues</span>
+            <span>Portal Issues</span>
           </NavLink>
           <NavLink
             to="/brief"
@@ -72,21 +73,23 @@ function TopBar() {
           </NavLink>
           <NavLink
             to="/readiness"
+            title="KarSamman filing-readiness score"
             className={({ isActive }) =>
               `topbar__link ${isActive ? 'topbar__link--active' : ''}`
             }
           >
             <Award aria-hidden size={16} />
-            <span>KarSamman Readiness</span>
+            <span>Readiness</span>
           </NavLink>
           <NavLink
             to="/explorer"
+            title="Aggregate counts across the synthetic warehouse"
             className={({ isActive }) =>
               `topbar__link ${isActive ? 'topbar__link--active' : ''}`
             }
           >
             <Database aria-hidden size={16} />
-            <span>How Common Is This</span>
+            <span>How Common</span>
           </NavLink>
         </nav>
         <div className="topbar__account">

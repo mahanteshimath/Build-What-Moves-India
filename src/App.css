@@ -258,21 +258,30 @@ body {
   padding: 0 1.25rem;
 }
 
+/* Never break the tab list mid-row; a narrow screen scrolls it instead. */
 .topbar__nav {
   display: flex;
   gap: 0.25rem;
-  flex-wrap: wrap;
+  flex: 1 1 auto;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  scrollbar-width: none;
+}
+
+.topbar__nav::-webkit-scrollbar {
+  display: none;
 }
 
 .topbar__link {
   display: inline-flex;
   align-items: center;
   gap: 0.45rem;
-  padding: 0.85rem 1.1rem;
+  padding: 0.85rem 0.95rem;
   color: var(--gov-text-muted);
   text-decoration: none;
   font-weight: 600;
   font-size: 0.92rem;
+  white-space: nowrap;
   border-bottom: 3px solid transparent;
   transition: all 150ms ease;
 }
@@ -293,6 +302,7 @@ body {
   display: flex;
   gap: 0.65rem;
   align-items: center;
+  margin-left: auto;
   padding: 0.4rem 0;
 }
 
