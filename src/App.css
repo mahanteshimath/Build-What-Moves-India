@@ -332,7 +332,13 @@ body {
   padding: clamp(1.25rem, 3vw, 2rem) 1.25rem;
 }
 
+/* A grid item defaults to min-width:auto, so one wide table would stretch the whole column. */
+.layout > * {
+  min-width: 0;
+}
+
 .panel {
+  min-width: 0;
   padding: clamp(1.2rem, 2.5vw, 1.75rem);
   border: 1px solid var(--gov-border);
   border-radius: var(--radius-md);
@@ -1418,6 +1424,8 @@ body {
 
 .table-scroll {
   overflow-x: auto;
+  min-width: 0;
+  max-width: 100%;
   border: 1px solid var(--gov-border);
   border-radius: var(--radius-sm);
   box-shadow: var(--shadow-sm);
@@ -1507,6 +1515,7 @@ body {
 
 .field--inline {
   flex: 1 1 16rem;
+  min-width: 0;
 }
 
 .field__label {
@@ -1516,6 +1525,8 @@ body {
 }
 
 .field__input {
+  min-width: 0;
+  max-width: 100%;
   padding: 0.55rem 0.75rem;
   border: 1px solid var(--gov-border);
   border-radius: var(--radius-sm);
