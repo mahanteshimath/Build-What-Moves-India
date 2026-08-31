@@ -101,7 +101,7 @@ export default function MyCasePage() {
           </button>
         </div>
 
-        <div className="privacy-badge privacy-badge--inline">
+        <div className="callout callout--ok">
           <ShieldCheck aria-hidden size={18} />
           <span>
             <strong>Nothing you type here leaves this browser.</strong> There is no upload,

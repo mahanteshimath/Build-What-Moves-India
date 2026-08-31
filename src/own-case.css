@@ -1,9 +1,5 @@
 /* ---- Own-figures form ------------------------------------------------- */
 
-.privacy-badge--inline {
-  margin: 1rem 0 1.25rem;
-}
-
 .own-form {
   display: flex;
   flex-direction: column;
